@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "itemsfromtext",
+  "version": "${version}",
+  "name": "Items From Text",
+  "description": "This mod allows for the creation of new items using text files.",
+  "authors": [
+    "wothers"
+  ],
+  "contact": {
+    "homepage": "https://www.youtube.com/channel/UCpgOvARWf3UoZb_yKXQAscQ",
+    "sources": ""
+  },
+  "license": "GNU GPLv3",
+  "icon": "assets/itemsfromtext/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "wothers.ift.ItemsFromText"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
