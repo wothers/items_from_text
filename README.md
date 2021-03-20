@@ -7,44 +7,44 @@ Place the jar file in your minecraft directory (usually the .minecraft folder).
 ## Creating Items
 1. Create a new folder called "itemsfromtext" in your .minecraft folder and navigate inside,
 2. For each item make a txt file and a 16x16 png image. Both files should be named your item's registry name (e.g. ender_pearl),
-3. Inside the txt file complete one of the templates below with your item's data,
+3. Inside the txt file complete one of the example templates below with your own item's data,
 4. After loading the game make sure to select the generated resource pack to see the items properly.
 
 # Templates
+Each item has a name field that represents the display name of the item.
+
+Most items (apart from tools) have a stack field which represents the max stack size.
 
 ## Basic Items:
+Example:
 ```
-name=
-stack=
+name=Ender Pearl
+stack=16
+isHandheld=false
 ```
-"name" is the display name of the item (e.g. Ender Pearl)
-
-"stack" is the max stack size (e.g. 16)
+isHandheld - is the item held like a stick or tool (set to true or false)
 
 ## Food:
+Example:
 ```
-name=
-stack=
+name=Apple
+stack=64
 type=food
-hunger=
-saturation=
+hunger=4
+saturation=2.4
+isHandheld=false
 ```
-"hunger" is the amount of hunger points refilled when eating (e.g. a value of 4 would be 2 whole hunger bar icons as each point is 1/2 a hunger bar icon)
-
-"saturation" is the amount of saturation replenished (rotten flesh - 0, golden carrot - 1.2)
 
 ## Tools:
+Example:
 ```
-name=
-type=
-quality=
-atkdamage=
-atkspeed=
+name=Ruby Pickaxe
+type=pickaxe
+attackDamage=9
+attackSpeed=-2.8
+miningSpeed=10
+miningLevel=4
+durability=5000
+enchantability=20
 ```
-"type" is the type of tool (supported are pickaxe, axe, shovel, hoe, sword)
-
-"quality" is the quality preset of the item (can be wood, gold, stone, iron, diamond, or netherite)
-
-"atkdamage" is the damage that the tool deals to entities
-
-"atkspeed" is the swing speed cooldown of the tool (e.g. pickaxes have a value of -2.8)
+"type" - the type of tool (supported are pickaxe, axe, shovel, hoe, sword)
