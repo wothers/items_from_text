@@ -8,8 +8,8 @@
     "wothers"
   ],
   "contact": {
-    "homepage": "https://www.youtube.com/channel/UCpgOvARWf3UoZb_yKXQAscQ",
-    "sources": ""
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/items-from-text",
+    "sources": "https://github.com/wothers/items_from_text"
   },
   "license": "GNU GPLv3",
   "icon": "assets/itemsfromtext/icon.png",
