@@ -19,7 +19,7 @@ public class HyperTool extends HyperItem {
 
     public HyperTool(String displayName, String textureName, String toolType, float miningSpeed, int miningLevel,
             float attackSpeed, int attackDamage, int durability, int enchantability, Ingredient repairIngredient) {
-        super(displayName, textureName, false, 1);
+        super(displayName, textureName, true, 1);
 
         class CustomToolMaterial implements ToolMaterial {
             public int getDurability() {

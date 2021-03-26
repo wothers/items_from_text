@@ -47,11 +47,15 @@ public class ItemsFromText implements ModInitializer {
 
             String langString = "";
 
-            File[] txtFiles = MAIN_FOLDER.toFile().listFiles(new FilenameFilter() {
-                public boolean accept(File f, String s) {
-                    return s.endsWith(".txt");
-                }
-            });
+            File[] txtFiles = {};
+            if (MAIN_FOLDER.toFile().exists()) {
+                txtFiles = MAIN_FOLDER.toFile().listFiles(new FilenameFilter() {
+                    public boolean accept(File f, String s) {
+                        return s.endsWith(".txt");
+                    }
+                });
+            }
+
             for (int index = 0; index < txtFiles.length; index++) {
                 String fileName = txtFiles[index].getName().replace(".txt", "");
                 File image = new File(MAIN_FOLDER + File.separator + fileName + ".png");
