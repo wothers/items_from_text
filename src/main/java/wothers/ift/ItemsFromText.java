@@ -77,38 +77,22 @@ public class ItemsFromText implements ModInitializer {
                 String parentName = null;
                 HyperItem hi = null;
 
-                String toolType = null;
-
                 if (p.getProperty("type") != null) {
                     switch (p.getProperty("type")) {
-                    case "pickaxe":
-                        toolType = HyperTool.PICKAXE;
-                        break;
-                    case "axe":
-                        toolType = HyperTool.AXE;
-                        break;
-                    case "shovel":
-                        toolType = HyperTool.SHOVEL;
-                        break;
-                    case "hoe":
-                        toolType = HyperTool.HOE;
-                        break;
-                    case "sword":
-                        toolType = HyperTool.SWORD;
-                        break;
                     case "food":
                         hi = new HyperFood(null, null, Boolean.parseBoolean(p.getProperty("isHandheld")),
                                 Integer.parseInt(p.getProperty("stack")), Integer.parseInt(p.getProperty("hunger")),
                                 Float.parseFloat(p.getProperty("saturation")));
                         break;
-                    }
-                    if (toolType != null) {
-                        hi = new HyperTool(null, null, toolType, Float.parseFloat(p.getProperty("miningSpeed")),
+                    case "tool":
+                        hi = new HyperTool(null, null, p.getProperty("toolType"),
+                                Float.parseFloat(p.getProperty("miningSpeed")),
                                 Integer.parseInt(p.getProperty("miningLevel")),
-                                Float.parseFloat(p.getProperty("attackSpeed")),
+                                Float.parseFloat(p.getProperty("attackSpeed")) - 4,
                                 Integer.parseInt(p.getProperty("attackDamage")),
                                 Integer.parseInt(p.getProperty("durability")),
                                 Integer.parseInt(p.getProperty("enchantability")), null);
+                        break;
                     }
                 } else {
                     hi = new HyperItem(null, null, Boolean.parseBoolean(p.getProperty("isHandheld")),

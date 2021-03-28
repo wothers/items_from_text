@@ -31,7 +31,11 @@ public class HyperTool extends HyperItem {
             }
 
             public float getAttackDamage() {
-                return (attackDamage / 2) - 1;
+                if (attackDamage % 2 == 0) {
+                    return (attackDamage / 2) - 1;
+                } else {
+                    return (attackDamage / 2);
+                }
             }
 
             public int getMiningLevel() {

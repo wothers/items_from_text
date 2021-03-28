@@ -29,22 +29,23 @@ Example:
 ```
 name=Apple
 stack=64
+isHandheld=false
 type=food
 hunger=4
 saturation=2.4
-isHandheld=false
 ```
 
 ## Tools:
 Example:
 ```
 name=Ruby Pickaxe
-type=pickaxe
+type=tool
+toolType=pickaxe
 attackDamage=9
-attackSpeed=-2.8
+attackSpeed=1.2
 miningSpeed=10
 miningLevel=4
 durability=5000
 enchantability=20
 ```
-"type" - the type of tool (supported are pickaxe, axe, shovel, hoe, sword)
+"toolType" - the type of tool (supported are pickaxe, axe, shovel, hoe, sword)
