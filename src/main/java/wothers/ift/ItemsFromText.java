@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +13,6 @@ import java.util.Properties;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
-
 import wothers.hr.HyperRegistry;
 import wothers.hr.items.HyperFood;
 import wothers.hr.items.HyperItem;
@@ -23,11 +20,10 @@ import wothers.hr.items.HyperTool;
 
 public class ItemsFromText implements ModInitializer {
     public static final String MOD_ID = "itemsfromtext";
-    public static final String[] SUBFOLDERS = { "resourcepacks", "Items From Text", "assets", MOD_ID, "models",
-            "textures", "item", "lang" };
-
+    public static final String[] SUBFOLDERS = { "resources", "Items From Text", "assets", MOD_ID, "models", "textures",
+            "item", "lang" };
     public static final Path MAIN_FOLDER = Paths.get(SUBFOLDERS[3]);
-    public static final Path RESOURCEPACKS_FOLDER = Paths.get(SUBFOLDERS[0], SUBFOLDERS[1]);
+    public static final Path RESOURCES_FOLDER = Paths.get(SUBFOLDERS[0], SUBFOLDERS[1]);
     public static final Path MODELS_ITEM_FOLDER = Paths.get(SUBFOLDERS[0], SUBFOLDERS[1], SUBFOLDERS[2], SUBFOLDERS[3],
             SUBFOLDERS[4], SUBFOLDERS[6]);
     public static final Path TEXTURES_ITEM_FOLDER = Paths.get(SUBFOLDERS[0], SUBFOLDERS[1], SUBFOLDERS[2],
@@ -37,16 +33,15 @@ public class ItemsFromText implements ModInitializer {
 
     public void onInitialize() {
         try {
-            if (RESOURCEPACKS_FOLDER.toFile().exists()) {
-                deleteDirectory(RESOURCEPACKS_FOLDER.toFile());
+            // Make folders
+            if (RESOURCES_FOLDER.toFile().exists()) {
+                deleteDirectory(RESOURCES_FOLDER.toFile());
             }
             Files.createDirectories(MODELS_ITEM_FOLDER);
             Files.createDirectories(TEXTURES_ITEM_FOLDER);
             Files.createDirectories(LANG_FOLDER);
-            mcmetaMake(RESOURCEPACKS_FOLDER);
-
-            String langString = "";
-
+            mcmetaMake(RESOURCES_FOLDER);
+            // Load all txt files into array
             File[] txtFiles = {};
             if (MAIN_FOLDER.toFile().exists()) {
                 txtFiles = MAIN_FOLDER.toFile().listFiles(new FilenameFilter() {
@@ -55,17 +50,17 @@ public class ItemsFromText implements ModInitializer {
                     }
                 });
             }
-
+            String langString = "";
             for (int index = 0; index < txtFiles.length; index++) {
+                Properties p = new Properties();
+                p.load(new FileInputStream(txtFiles[index]));
                 String fileName = txtFiles[index].getName().replace(".txt", "");
+                // Copy image file
                 File image = new File(MAIN_FOLDER + File.separator + fileName + ".png");
                 if (image.exists()) {
                     copyFile(image, new File(TEXTURES_ITEM_FOLDER + File.separator + fileName + ".png"));
                 }
-
-                Properties p = new Properties();
-                p.load(new FileInputStream(txtFiles[index]));
-
+                // Add entry to lang string
                 if (p.getProperty("name") != null) {
                     langString = langString + "\"item." + MOD_ID + "." + fileName + "\":" + "\"" + p.getProperty("name")
                             + "\"";
@@ -73,41 +68,35 @@ public class ItemsFromText implements ModInitializer {
                         langString = langString + ",";
                     }
                 }
-
-                String parentName = null;
+                // Register item and make model file
                 HyperItem hi = null;
-
                 if (p.getProperty("type") != null) {
                     switch (p.getProperty("type")) {
                     case "food":
-                        hi = new HyperFood(null, null, Boolean.parseBoolean(p.getProperty("isHandheld")),
+                        hi = new HyperFood(Boolean.parseBoolean(p.getProperty("isHandheld")),
                                 Integer.parseInt(p.getProperty("stack")), Integer.parseInt(p.getProperty("hunger")),
                                 Float.parseFloat(p.getProperty("saturation")));
                         break;
                     case "tool":
-                        hi = new HyperTool(null, null, p.getProperty("toolType"),
-                                Float.parseFloat(p.getProperty("miningSpeed")),
+                        hi = new HyperTool(p.getProperty("toolType"), Float.parseFloat(p.getProperty("miningSpeed")),
                                 Integer.parseInt(p.getProperty("miningLevel")),
-                                Float.parseFloat(p.getProperty("attackSpeed")) - 4,
+                                Float.parseFloat(p.getProperty("attackSpeed")),
                                 Integer.parseInt(p.getProperty("attackDamage")),
                                 Integer.parseInt(p.getProperty("durability")),
                                 Integer.parseInt(p.getProperty("enchantability")), null);
                         break;
                     }
                 } else {
-                    hi = new HyperItem(null, null, Boolean.parseBoolean(p.getProperty("isHandheld")),
+                    hi = new HyperItem(Boolean.parseBoolean(p.getProperty("isHandheld")),
                             Integer.parseInt(p.getProperty("stack")));
                 }
                 if (hi.isHandheld()) {
-                    parentName = "handheld";
+                    jsonModelMake(MODELS_ITEM_FOLDER, fileName, "handheld");
                 } else {
-                    parentName = "generated";
+                    jsonModelMake(MODELS_ITEM_FOLDER, fileName, "generated");
                 }
-
                 HyperRegistry.register(new Identifier(MOD_ID, fileName), hi);
-                jsonModelMake(MODELS_ITEM_FOLDER, fileName, parentName);
             }
-
             jsonLangMake(LANG_FOLDER, langString);
         } catch (IOException e) {
             e.printStackTrace();
@@ -125,8 +114,8 @@ public class ItemsFromText implements ModInitializer {
     }
 
     private void copyFile(File source, File destination) throws IOException {
-        InputStream is = new FileInputStream(source);
-        OutputStream os = new FileOutputStream(destination);
+        FileInputStream is = new FileInputStream(source);
+        FileOutputStream os = new FileOutputStream(destination);
         byte[] buffer = new byte[1024];
         int length;
         while ((length = is.read(buffer)) > 0) {
@@ -140,7 +129,6 @@ public class ItemsFromText implements ModInitializer {
         FileWriter fw = new FileWriter(p + File.separator + "pack.mcmeta");
         fw.write("{\"pack\":{\"pack_format\":6,\"description\":\"Resources for the Items From Text mod.\"}}");
         fw.close();
-
     }
 
     private void jsonModelMake(Path p, String fileName, String parentName) throws IOException {

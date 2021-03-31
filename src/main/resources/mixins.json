@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "wothers.ift.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PackLoaderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

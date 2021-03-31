@@ -5,13 +5,9 @@ import net.minecraft.item.ItemGroup;
 
 public class HyperItem {
     protected Item item;
-    private String displayName;
-    private String textureName;
     private boolean isHandheld;
 
-    public HyperItem(String displayName, String textureName, boolean isHandheld, int maxStackSize) {
-        this.displayName = displayName;
-        this.textureName = textureName;
+    public HyperItem(boolean isHandheld, int maxStackSize) {
         this.isHandheld = isHandheld;
         if (maxStackSize < 1 || maxStackSize > 64) {
             throw new InvalidStackSizeException();
@@ -22,14 +18,6 @@ public class HyperItem {
 
     public Item getItem() {
         return item;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getTextureName() {
-        return textureName;
     }
 
     public boolean isHandheld() {

@@ -17,9 +17,10 @@ public class HyperTool extends HyperItem {
     public static final String HOE = "hoe";
     public static final String SWORD = "sword";
 
-    public HyperTool(String displayName, String textureName, String toolType, float miningSpeed, int miningLevel,
-            float attackSpeed, int attackDamage, int durability, int enchantability, Ingredient repairIngredient) {
-        super(displayName, textureName, true, 1);
+    public HyperTool(String toolType, float miningSpeed, int miningLevel, float attackSpeed, int attackDamage,
+            int durability, int enchantability, Ingredient repairIngredient) {
+        super(true, 1);
+        attackSpeed -= 4;
 
         class CustomToolMaterial implements ToolMaterial {
             public int getDurability() {
@@ -31,11 +32,7 @@ public class HyperTool extends HyperItem {
             }
 
             public float getAttackDamage() {
-                if (attackDamage % 2 == 0) {
-                    return (attackDamage / 2) - 1;
-                } else {
-                    return (attackDamage / 2);
-                }
+                return attackDamage % 2 == 0 ? (attackDamage / 2) - 1 : attackDamage / 2;
             }
 
             public int getMiningLevel() {
