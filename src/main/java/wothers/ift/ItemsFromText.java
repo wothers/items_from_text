@@ -22,6 +22,7 @@ public class ItemsFromText implements ModInitializer {
     public static final String MOD_ID = "itemsfromtext";
     public static final String[] SUBFOLDERS = { "resources", "Items From Text", "assets", MOD_ID, "models", "textures",
             "item", "lang" };
+    public static final String DESCRIPTION = "Resources for the Items From Text mod.";
     public static final Path MAIN_FOLDER = Paths.get(SUBFOLDERS[3]);
     public static final Path RESOURCES_FOLDER = Paths.get(SUBFOLDERS[0], SUBFOLDERS[1]);
     public static final Path MODELS_ITEM_FOLDER = Paths.get(SUBFOLDERS[0], SUBFOLDERS[1], SUBFOLDERS[2], SUBFOLDERS[3],
@@ -73,29 +74,45 @@ public class ItemsFromText implements ModInitializer {
                 if (p.getProperty("type") != null) {
                     switch (p.getProperty("type")) {
                     case "food":
-                        hi = new HyperFood(Boolean.parseBoolean(p.getProperty("isHandheld")),
-                                Integer.parseInt(p.getProperty("stack")), Integer.parseInt(p.getProperty("hunger")),
-                                Float.parseFloat(p.getProperty("saturation")));
+                        try {
+                            hi = new HyperFood(Boolean.parseBoolean(p.getProperty("isHandheld")),
+                                    Integer.parseInt(p.getProperty("stack")), Integer.parseInt(p.getProperty("hunger")),
+                                    Float.parseFloat(p.getProperty("saturation")));
+                        } catch (Exception e) {
+                            System.out.println("Failed to load item: " + fileName);
+                        }
                         break;
                     case "tool":
-                        hi = new HyperTool(p.getProperty("toolType"), Float.parseFloat(p.getProperty("miningSpeed")),
-                                Integer.parseInt(p.getProperty("miningLevel")),
-                                Float.parseFloat(p.getProperty("attackSpeed")),
-                                Integer.parseInt(p.getProperty("attackDamage")),
-                                Integer.parseInt(p.getProperty("durability")),
-                                Integer.parseInt(p.getProperty("enchantability")), null);
+                        try {
+                            hi = new HyperTool(p.getProperty("toolType"),
+                                    Float.parseFloat(p.getProperty("miningSpeed")),
+                                    Integer.parseInt(p.getProperty("miningLevel")),
+                                    Float.parseFloat(p.getProperty("attackSpeed")),
+                                    Integer.parseInt(p.getProperty("attackDamage")),
+                                    Integer.parseInt(p.getProperty("durability")),
+                                    Integer.parseInt(p.getProperty("enchantability")), null);
+                        } catch (Exception e) {
+                            System.out.println("Failed to load item: " + fileName);
+                        }
                         break;
                     }
                 } else {
-                    hi = new HyperItem(Boolean.parseBoolean(p.getProperty("isHandheld")),
-                            Integer.parseInt(p.getProperty("stack")));
+                    try {
+                        hi = new HyperItem(Boolean.parseBoolean(p.getProperty("isHandheld")),
+                                Integer.parseInt(p.getProperty("stack")));
+                    } catch (Exception e) {
+                        System.out.println("Failed to load item: " + fileName);
+                    }
+
                 }
-                if (hi.isHandheld()) {
-                    jsonModelMake(MODELS_ITEM_FOLDER, fileName, "handheld");
-                } else {
-                    jsonModelMake(MODELS_ITEM_FOLDER, fileName, "generated");
+                if (hi != null) {
+                    if (hi.isHandheld()) {
+                        jsonModelMake(MODELS_ITEM_FOLDER, fileName, "handheld");
+                    } else {
+                        jsonModelMake(MODELS_ITEM_FOLDER, fileName, "generated");
+                    }
+                    HyperRegistry.register(new Identifier(MOD_ID, fileName), hi);
                 }
-                HyperRegistry.register(new Identifier(MOD_ID, fileName), hi);
             }
             jsonLangMake(LANG_FOLDER, langString);
         } catch (IOException e) {
@@ -127,7 +144,7 @@ public class ItemsFromText implements ModInitializer {
 
     private void mcmetaMake(Path p) throws IOException {
         FileWriter fw = new FileWriter(p + File.separator + "pack.mcmeta");
-        fw.write("{\"pack\":{\"pack_format\":6,\"description\":\"Resources for the Items From Text mod.\"}}");
+        fw.write("{\"pack\":{\"pack_format\":6,\"description\":\"" + DESCRIPTION + "\"}}");
         fw.close();
     }
 
