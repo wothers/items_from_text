@@ -8,9 +8,9 @@ Place the jar file in your minecraft directory (usually the .minecraft folder).
 
 ## Creating Items
 
-1. Create a new folder called "itemsfromtext" in your .minecraft folder and navigate inside,
-2. For each item make a txt file and a 16x16 png image. Both files should be named your item's registry name (e.g. ender_pearl),
-3. Inside the txt file complete one of the example templates below with your own item's data,
+1. Create a new folder called "itemsfromtext" in your .minecraft folder and navigate inside
+2. For each item make a txt file and a 16x16 png image. Both files should be named your item's registry name (e.g. ender_pearl)
+3. Inside the txt file complete one of the example templates below with your own item's data
 
 # Templates
 
@@ -22,16 +22,12 @@ Optional for non tool items: "isHandheld" field (true or false) - is the item he
 
 ## Basic Items:
 
-Example:
-
 ```
 name=Ender Pearl
 stack=16
 ```
 
 ## Food:
-
-Example:
 
 ```
 name=Apple
@@ -42,8 +38,6 @@ saturation=2.4
 ```
 
 ## Tools:
-
-Example:
 
 ```
 name=Ruby Pickaxe
