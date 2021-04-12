@@ -9,8 +9,9 @@ Place the jar file in your minecraft directory (usually the .minecraft folder).
 ## Creating Items
 
 1. Create a new folder called "itemsfromtext" in your .minecraft folder and navigate inside
-2. For each item make a txt file and a 16x16 png image. Both files should be named your item's registry name (e.g. ender_pearl)
+2. For each item make a txt file and a png image. Both files should be named your item's registry name (e.g. ender_pearl)
 3. Inside the txt file complete one of the example templates below with your own item's data
+4. For custom namespaces, make a new folder within the main folder and put items in that folder
 
 # Templates
 
