@@ -67,10 +67,11 @@ public class ItemsFromText implements ModInitializer {
     }
 
     private void parseItems(Path path) throws IOException {
-        final Path MODELS_ITEM_FOLDER = Paths.get(FOLDER_NAMES[0], FOLDER_NAMES[1], FOLDER_NAMES[2],
-                path.toFile().getName(), FOLDER_NAMES[4], FOLDER_NAMES[6]);
-        final Path TEXTURES_ITEM_FOLDER = Paths.get(FOLDER_NAMES[0], FOLDER_NAMES[1], FOLDER_NAMES[2],
-                path.toFile().getName(), FOLDER_NAMES[5], FOLDER_NAMES[6]);
+        String namespaceName = path.toFile().getName();
+        final Path MODELS_ITEM_FOLDER = Paths.get(FOLDER_NAMES[0], FOLDER_NAMES[1], FOLDER_NAMES[2], namespaceName,
+                FOLDER_NAMES[4], FOLDER_NAMES[6]);
+        final Path TEXTURES_ITEM_FOLDER = Paths.get(FOLDER_NAMES[0], FOLDER_NAMES[1], FOLDER_NAMES[2], namespaceName,
+                FOLDER_NAMES[5], FOLDER_NAMES[6]);
         Files.createDirectories(MODELS_ITEM_FOLDER);
         Files.createDirectories(TEXTURES_ITEM_FOLDER);
         // Load all txt files into array
@@ -93,50 +94,40 @@ public class ItemsFromText implements ModInitializer {
             }
             // Add entry to lang file
             if (p.getProperty("name") != null) {
-                langObj.addProperty("item." + path.toFile().getName() + "." + fileName, p.getProperty("name"));
+                langObj.addProperty("item." + namespaceName + "." + fileName, p.getProperty("name"));
             }
             // Register item and make model file
             HyperItem hi = null;
-            if (p.getProperty("type") != null) {
-                switch (p.getProperty("type")) {
-                case "food":
-                    try {
+            try {
+                if (p.getProperty("type") != null) {
+                    switch (p.getProperty("type")) {
+                    case "food":
                         hi = new HyperFood(Boolean.parseBoolean(p.getProperty("isHandheld")),
                                 Integer.parseInt(p.getProperty("stack")), Integer.parseInt(p.getProperty("hunger")),
                                 Float.parseFloat(p.getProperty("saturation")));
-                    } catch (Exception e) {
-                        System.out.println("Failed to load food item: " + fileName);
-                    }
-                    break;
-                case "tool":
-                    try {
+                        break;
+                    case "tool":
                         hi = new HyperTool(p.getProperty("toolType"), Float.parseFloat(p.getProperty("miningSpeed")),
                                 Integer.parseInt(p.getProperty("miningLevel")),
                                 Float.parseFloat(p.getProperty("attackSpeed")),
                                 Integer.parseInt(p.getProperty("attackDamage")),
                                 Integer.parseInt(p.getProperty("durability")),
                                 Integer.parseInt(p.getProperty("enchantability")), null);
-                    } catch (Exception e) {
-                        System.out.println("Failed to load tool item: " + fileName);
+                        break;
                     }
-                    break;
-                }
-            } else {
-                try {
+                } else {
                     hi = new HyperItem(Boolean.parseBoolean(p.getProperty("isHandheld")),
                             Integer.parseInt(p.getProperty("stack")));
-                } catch (Exception e) {
-                    System.out.println("Failed to load item: " + fileName);
                 }
-            }
-            if (hi != null) {
                 if (hi.isHandheld()) {
-                    jsonModelMake(MODELS_ITEM_FOLDER, path.toFile().getName(), fileName, "handheld");
+                    jsonModelMake(MODELS_ITEM_FOLDER, namespaceName, fileName, "handheld");
                 } else {
-                    jsonModelMake(MODELS_ITEM_FOLDER, path.toFile().getName(), fileName, "generated");
+                    jsonModelMake(MODELS_ITEM_FOLDER, namespaceName, fileName, "generated");
                 }
-                HyperRegistry.register(new Identifier(path.toFile().getName(), fileName), hi);
-                System.out.println("Loaded item: " + path.toFile().getName() + File.separator + fileName);
+                HyperRegistry.register(new Identifier(namespaceName, fileName), hi);
+                System.out.println("Loaded item: " + namespaceName + ":" + fileName);
+            } catch (Exception e) {
+                System.err.println("Failed to load item: " + namespaceName + ":" + fileName);
             }
         }
     }
