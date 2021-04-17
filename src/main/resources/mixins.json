@@ -4,7 +4,8 @@
   "package": "wothers.ift.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "PackLoaderMixin"
+    "PackLoaderMixin",
+    "RecipeLoaderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

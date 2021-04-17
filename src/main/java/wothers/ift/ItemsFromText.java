@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -14,10 +15,8 @@ import java.util.Properties;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.util.Identifier;
 import wothers.hr.HyperRegistry;
 import wothers.hr.items.HyperFood;
 import wothers.hr.items.HyperItem;
@@ -33,8 +32,6 @@ public class ItemsFromText implements ModInitializer {
     public static final Path LANG_FOLDER = Paths.get(FOLDER_NAMES[0], FOLDER_NAMES[1], FOLDER_NAMES[2], FOLDER_NAMES[3],
             FOLDER_NAMES[7]);
 
-    private JsonObject langObj = new JsonObject();
-
     public void onInitialize() {
         File[] subdirectories = {};
         if (MAIN_FOLDER.toFile().exists()) {
@@ -44,6 +41,7 @@ public class ItemsFromText implements ModInitializer {
                 }
             });
         }
+
         try {
             // Make folders
             if (RESOURCES_FOLDER.toFile().exists()) {
@@ -59,7 +57,7 @@ public class ItemsFromText implements ModInitializer {
             // Make language file for display names
             Gson gson = new GsonBuilder().create();
             FileWriter fw = new FileWriter(LANG_FOLDER + File.separator + "en_us.json");
-            fw.write(gson.toJson(langObj));
+            fw.write(gson.toJson(HyperRegistry.getLangObject()));
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,7 +72,7 @@ public class ItemsFromText implements ModInitializer {
                 FOLDER_NAMES[5], FOLDER_NAMES[6]);
         Files.createDirectories(MODELS_ITEM_FOLDER);
         Files.createDirectories(TEXTURES_ITEM_FOLDER);
-        // Load all txt files into array
+
         File[] txtFiles = {};
         if (path.toFile().exists()) {
             txtFiles = path.toFile().listFiles(new FilenameFilter() {
@@ -83,20 +81,17 @@ public class ItemsFromText implements ModInitializer {
                 }
             });
         }
-        for (int index = 0; index < txtFiles.length; index++) {
+
+        for (File f : txtFiles) {
             Properties p = new Properties();
-            p.load(new FileInputStream(txtFiles[index]));
-            String fileName = txtFiles[index].getName().replace(".txt", "");
-            // Copy image file
-            File image = new File(path + File.separator + fileName + ".png");
+            p.load(new FileReader(f));
+            String itemName = f.getName().replace(".txt", "");
+
+            File image = new File(path + File.separator + itemName + ".png");
             if (image.exists()) {
-                copyFile(image, new File(TEXTURES_ITEM_FOLDER + File.separator + fileName + ".png"));
+                copyFile(image, new File(TEXTURES_ITEM_FOLDER + File.separator + itemName + ".png"));
             }
-            // Add entry to lang file
-            if (p.getProperty("name") != null) {
-                langObj.addProperty("item." + namespaceName + "." + fileName, p.getProperty("name"));
-            }
-            // Register item and make model file
+
             HyperItem hi = null;
             try {
                 if (p.getProperty("type") != null) {
@@ -119,15 +114,15 @@ public class ItemsFromText implements ModInitializer {
                     hi = new HyperItem(Boolean.parseBoolean(p.getProperty("isHandheld")),
                             Integer.parseInt(p.getProperty("stack")));
                 }
-                if (hi.isHandheld()) {
-                    jsonModelMake(MODELS_ITEM_FOLDER, namespaceName, fileName, "handheld");
-                } else {
-                    jsonModelMake(MODELS_ITEM_FOLDER, namespaceName, fileName, "generated");
+                jsonModelMake(MODELS_ITEM_FOLDER, namespaceName, itemName, hi.isHandheld());
+                File recipeFile = new File(path + File.separator + itemName + "_recipe.json");
+                if (recipeFile.exists()) {
+                    HyperRegistry.Recipe.add(namespaceName, itemName, recipeFile);
                 }
-                HyperRegistry.register(new Identifier(namespaceName, fileName), hi);
-                System.out.println("Loaded item: " + namespaceName + ":" + fileName);
+                HyperRegistry.register(namespaceName, itemName, hi, p.getProperty("name"));
+                System.out.println("Loaded item: " + namespaceName + ":" + itemName);
             } catch (Exception e) {
-                System.err.println("Failed to load item: " + namespaceName + ":" + fileName);
+                System.err.println("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
             }
         }
     }
@@ -160,10 +155,16 @@ public class ItemsFromText implements ModInitializer {
         fw.close();
     }
 
-    private void jsonModelMake(Path p, String namespace, String fileName, String parentName) throws IOException {
-        FileWriter fw = new FileWriter(p + File.separator + fileName + ".json");
-        fw.write("{\"parent\":\"minecraft:item/" + parentName + "\",\"textures\":{\"layer0\":\"" + namespace + ":item/"
-                + fileName + "\"}}");
+    private void jsonModelMake(Path p, String namespaceName, String itemName, boolean b) throws IOException {
+        String parentName;
+        if (b) {
+            parentName = "handheld";
+        } else {
+            parentName = "generated";
+        }
+        FileWriter fw = new FileWriter(p + File.separator + itemName + ".json");
+        fw.write("{\"parent\":\"minecraft:item/" + parentName + "\",\"textures\":{\"layer0\":\"" + namespaceName
+                + ":item/" + itemName + "\"}}");
         fw.close();
     }
 }
