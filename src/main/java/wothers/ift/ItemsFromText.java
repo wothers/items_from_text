@@ -97,9 +97,11 @@ public class ItemsFromText implements ModInitializer {
                 if (p.getProperty("type") != null) {
                     switch (p.getProperty("type")) {
                     case "food":
-                        hi = new HyperFood(Boolean.parseBoolean(p.getProperty("isHandheld")),
-                                Integer.parseInt(p.getProperty("stack")), Integer.parseInt(p.getProperty("hunger")),
-                                Float.parseFloat(p.getProperty("saturation")));
+                        hi = new HyperFood(Integer.parseInt(p.getProperty("stack")),
+                                Integer.parseInt(p.getProperty("hunger")),
+                                Float.parseFloat(p.getProperty("saturation")),
+                                Boolean.parseBoolean(p.getProperty("isHandheld")),
+                                Boolean.parseBoolean(p.getProperty("isFireproof")));
                         break;
                     case "tool":
                         hi = new HyperTool(p.getProperty("toolType"), Float.parseFloat(p.getProperty("miningSpeed")),
@@ -107,12 +109,14 @@ public class ItemsFromText implements ModInitializer {
                                 Float.parseFloat(p.getProperty("attackSpeed")),
                                 Integer.parseInt(p.getProperty("attackDamage")),
                                 Integer.parseInt(p.getProperty("durability")),
-                                Integer.parseInt(p.getProperty("enchantability")), null);
+                                Integer.parseInt(p.getProperty("enchantability")), null,
+                                Boolean.parseBoolean(p.getProperty("isFireproof")));
                         break;
                     }
                 } else {
-                    hi = new HyperItem(Boolean.parseBoolean(p.getProperty("isHandheld")),
-                            Integer.parseInt(p.getProperty("stack")));
+                    hi = new HyperItem(Integer.parseInt(p.getProperty("stack")),
+                            Boolean.parseBoolean(p.getProperty("isHandheld")),
+                            Boolean.parseBoolean(p.getProperty("isFireproof")));
                 }
                 jsonModelMake(MODELS_ITEM_FOLDER, namespaceName, itemName, hi.isHandheld());
                 File recipeFile = new File(path + File.separator + itemName + "_recipe.json");
@@ -120,7 +124,6 @@ public class ItemsFromText implements ModInitializer {
                     HyperRegistry.Recipe.add(namespaceName, itemName, recipeFile);
                 }
                 HyperRegistry.register(namespaceName, itemName, hi, p.getProperty("name"));
-                System.out.println("Loaded item: " + namespaceName + ":" + itemName);
             } catch (Exception e) {
                 System.err.println("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
             }

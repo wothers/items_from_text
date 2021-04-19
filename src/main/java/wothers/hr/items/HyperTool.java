@@ -18,8 +18,8 @@ public class HyperTool extends HyperItem {
     public static final String SWORD = "sword";
 
     public HyperTool(String toolType, float miningSpeed, int miningLevel, float attackSpeed, int attackDamage,
-            int durability, int enchantability, Ingredient repairIngredient) {
-        super(true, 1);
+            int durability, int enchantability, Ingredient repairIngredient, boolean isFireproof) {
+        super(1, true, isFireproof);
         attackSpeed -= 4;
 
         class CustomToolMaterial implements ToolMaterial {
@@ -48,29 +48,30 @@ public class HyperTool extends HyperItem {
             }
         }
 
+        Item.Settings settings = new Item.Settings().group(ItemGroup.TOOLS);
+        if (isFireproof) {
+            settings = settings.fireproof();
+        }
+
         switch (toolType) {
         case PICKAXE:
-            item = new CustomPickaxeItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed,
-                    new Item.Settings().group(ItemGroup.TOOLS));
+            item = new CustomPickaxeItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed, settings);
             break;
         case AXE:
-            item = new CustomAxeItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed,
-                    new Item.Settings().group(ItemGroup.TOOLS));
+            item = new CustomAxeItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed, settings);
             break;
         case SHOVEL:
-            item = new ShovelItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed,
-                    new Item.Settings().group(ItemGroup.TOOLS));
+            item = new ShovelItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed, settings);
             break;
         case HOE:
-            item = new CustomHoeItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed,
-                    new Item.Settings().group(ItemGroup.TOOLS));
+            item = new CustomHoeItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed, settings);
             break;
         case SWORD:
-            item = new SwordItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed,
-                    new Item.Settings().group(ItemGroup.COMBAT));
+            settings = settings.group(ItemGroup.COMBAT);
+            item = new SwordItem(new CustomToolMaterial(), attackDamage / 2, attackSpeed, settings);
             break;
         default:
-            throw new InvalidToolTypeException();
+            throw new RuntimeException("Invalid tool type - only pickaxe, axe, shovel, hoe or sword are permitted");
         }
     }
 
@@ -89,14 +90,6 @@ public class HyperTool extends HyperItem {
     private class CustomHoeItem extends HoeItem {
         private CustomHoeItem(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
             super(material, attackDamage, attackSpeed, settings);
-        }
-    }
-
-    private class InvalidToolTypeException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        private InvalidToolTypeException() {
-            super("Invalid tool type - only pickaxe, axe, shovel, hoe or sword are permitted");
         }
     }
 }

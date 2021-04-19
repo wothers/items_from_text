@@ -30,13 +30,12 @@ public class HyperRegistry {
         private static Map<Identifier, JsonElement> map = new HashMap<Identifier, JsonElement>();
 
         public static void add(String namespaceName, String itemName, File recipeFile) {
-            JsonObject recipeElement = new JsonObject();
+            JsonElement recipeElement = new JsonObject();
             try {
-                recipeElement = (JsonObject) new JsonParser().parse(new JsonReader(new FileReader(recipeFile)));
+                recipeElement = new JsonParser().parse(new JsonReader(new FileReader(recipeFile)));
                 map.put(new Identifier(namespaceName, itemName), recipeElement);
             } catch (Exception e) {
-                System.err.println(
-                        "Failed to load crafting recipe for item: " + namespaceName + ":" + itemName + " - " + e);
+                System.err.println("Failed to load recipe for item: " + namespaceName + ":" + itemName + " - " + e);
             }
         }
 

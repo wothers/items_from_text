@@ -17,7 +17,6 @@ import wothers.hr.HyperRegistry;
 
 @Mixin(RecipeManager.class)
 public class RecipeLoaderMixin {
-
     @Inject(method = "apply", at = @At("HEAD"))
     public void interceptApply(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler,
             CallbackInfo info) {
