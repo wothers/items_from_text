@@ -20,9 +20,9 @@ public class ItemsFromText implements ModInitializer {
     public static final Path MAIN_FOLDER = Paths.get(MOD_ID);
 
     public void onInitialize() {
-        File[] subdirectories = {};
+        File[] subDirectories = {};
         if (MAIN_FOLDER.toFile().exists()) {
-            subdirectories = MAIN_FOLDER.toFile().listFiles(new FileFilter() {
+            subDirectories = MAIN_FOLDER.toFile().listFiles(new FileFilter() {
                 public boolean accept(File file) {
                     return file.isDirectory();
                 }
@@ -31,7 +31,7 @@ public class ItemsFromText implements ModInitializer {
 
         try {
             parseItems(MAIN_FOLDER);
-            for (File file : subdirectories) {
+            for (File file : subDirectories) {
                 parseItems(file.toPath());
             }
         } catch (IOException e) {
@@ -51,10 +51,10 @@ public class ItemsFromText implements ModInitializer {
             });
         }
 
-        for (File f : txtFiles) {
+        for (File file : txtFiles) {
             Properties p = new Properties();
-            p.load(new FileReader(f));
-            String itemName = f.getName().replace(".txt", "");
+            p.load(new FileReader(file));
+            String itemName = file.getName().replace(".txt", "");
 
             HyperItem hi = null;
             try {

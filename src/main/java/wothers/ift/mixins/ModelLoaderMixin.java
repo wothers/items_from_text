@@ -13,7 +13,7 @@ import wothers.hr.HyperRegistry;
 @Mixin(ModelLoader.class)
 public class ModelLoaderMixin {
     @Inject(method = "loadModelFromJson", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourceManager;getResource(Lnet/minecraft/util/Identifier;)Lnet/minecraft/resource/Resource;"), cancellable = true)
-    public void loadModelFromJson(Identifier id, CallbackInfoReturnable<JsonUnbakedModel> cir) {
+    private void loadModelFromJson(Identifier id, CallbackInfoReturnable<JsonUnbakedModel> cir) {
         if (!HyperRegistry.getRegisteredItems().containsKey(id.toString())) {
             return;
         }
