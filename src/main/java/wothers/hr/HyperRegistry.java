@@ -15,15 +15,31 @@ import net.minecraft.util.registry.Registry;
 import wothers.hr.items.HyperItem;
 
 public class HyperRegistry {
-    private static JsonObject langObject = new JsonObject();
+    private static Map<String, String> langMap = new HashMap<String, String>();
+    private static Map<String, String> registeredItems = new HashMap<String, String>();
 
     public static void register(String namespaceName, String itemName, HyperItem hi, String displayName) {
-        Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), hi.getItem());
-        langObject.addProperty("item." + namespaceName + "." + itemName, displayName);
+        if (displayName == null) {
+            throw new RuntimeException("Missing item display name.");
+        }
+        Identifier id = new Identifier(namespaceName, itemName);
+        Registry.register(Registry.ITEM, id, hi.getItem());
+        langMap.put("item." + namespaceName + "." + itemName, displayName);
+        String modelType;
+        if (hi.isHandheld()) {
+            modelType = "handheld";
+        } else {
+            modelType = "generated";
+        }
+        registeredItems.put(namespaceName + ":item/" + itemName, modelType);
     }
 
-    public static JsonObject getLangObject() {
-        return langObject;
+    public static Map<String, String> getLangMap() {
+        return langMap;
+    }
+
+    public static Map<String, String> getRegisteredItems() {
+        return registeredItems;
     }
 
     public static class Recipe {

@@ -3,10 +3,7 @@
   "minVersion": "0.8",
   "package": "wothers.ift.mixins",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
-    "PackLoaderMixin",
-    "RecipeLoaderMixin"
-  ],
+  "mixins": ["LanguageLoaderMixin", "ModelLoaderMixin", "RecipeLoaderMixin"],
   "injectors": {
     "defaultRequire": 1
   }
