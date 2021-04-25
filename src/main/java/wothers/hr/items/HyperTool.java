@@ -18,7 +18,7 @@ public class HyperTool extends HyperItem {
     public static final String SWORD = "sword";
 
     public HyperTool(String toolType, float miningSpeed, int miningLevel, float attackSpeed, int attackDamage,
-            int durability, int enchantability, Ingredient repairIngredient, boolean isFireproof) {
+            int durability, int enchantability, boolean isFireproof) {
         super(1, true, isFireproof);
         attackSpeed -= 4;
 
@@ -44,7 +44,7 @@ public class HyperTool extends HyperItem {
             }
 
             public Ingredient getRepairIngredient() {
-                return repairIngredient;
+                return null;
             }
         }
 

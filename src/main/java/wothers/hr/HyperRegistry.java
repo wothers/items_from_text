@@ -18,19 +18,13 @@ public class HyperRegistry {
     private static Map<String, String> langMap = new HashMap<String, String>();
     private static Map<String, String> registeredItems = new HashMap<String, String>();
 
-    public static void register(String namespaceName, String itemName, HyperItem hi, String displayName) {
+    public static void register(String namespaceName, String itemName, HyperItem item, String displayName) {
         if (displayName == null) {
-            throw new RuntimeException("Missing item display name.");
+            throw new RuntimeException("Missing item display name");
         }
-        Identifier id = new Identifier(namespaceName, itemName);
-        Registry.register(Registry.ITEM, id, hi.getItem());
+        Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
         langMap.put("item." + namespaceName + "." + itemName, displayName);
-        String modelType;
-        if (hi.isHandheld()) {
-            modelType = "handheld";
-        } else {
-            modelType = "generated";
-        }
+        String modelType = item.isHandheld() ? "handheld" : "generated";
         registeredItems.put(namespaceName + ":item/" + itemName, modelType);
     }
 

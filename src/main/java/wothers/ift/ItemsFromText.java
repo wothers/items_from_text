@@ -52,41 +52,42 @@ public class ItemsFromText implements ModInitializer {
         }
 
         for (File file : txtFiles) {
-            Properties p = new Properties();
-            p.load(new FileReader(file));
+            Properties properties = new Properties();
+            properties.load(new FileReader(file));
             String itemName = file.getName().replace(".txt", "");
 
-            HyperItem hi = null;
+            HyperItem item = null;
             try {
-                if (p.getProperty("type") != null) {
-                    switch (p.getProperty("type")) {
+                if (properties.getProperty("type") != null) {
+                    switch (properties.getProperty("type")) {
                     case "food":
-                        hi = new HyperFood(Integer.parseInt(p.getProperty("stack")),
-                                Integer.parseInt(p.getProperty("hunger")),
-                                Float.parseFloat(p.getProperty("saturation")),
-                                Boolean.parseBoolean(p.getProperty("isHandheld")),
-                                Boolean.parseBoolean(p.getProperty("isFireproof")));
+                        item = new HyperFood(Integer.parseInt(properties.getProperty("stack")),
+                                Integer.parseInt(properties.getProperty("hunger")),
+                                Float.parseFloat(properties.getProperty("saturation")),
+                                Boolean.parseBoolean(properties.getProperty("isHandheld")),
+                                Boolean.parseBoolean(properties.getProperty("isFireproof")));
                         break;
                     case "tool":
-                        hi = new HyperTool(p.getProperty("toolType"), Float.parseFloat(p.getProperty("miningSpeed")),
-                                Integer.parseInt(p.getProperty("miningLevel")),
-                                Float.parseFloat(p.getProperty("attackSpeed")),
-                                Integer.parseInt(p.getProperty("attackDamage")),
-                                Integer.parseInt(p.getProperty("durability")),
-                                Integer.parseInt(p.getProperty("enchantability")), null,
-                                Boolean.parseBoolean(p.getProperty("isFireproof")));
+                        item = new HyperTool(properties.getProperty("toolType"),
+                                Float.parseFloat(properties.getProperty("miningSpeed")),
+                                Integer.parseInt(properties.getProperty("miningLevel")),
+                                Float.parseFloat(properties.getProperty("attackSpeed")),
+                                Integer.parseInt(properties.getProperty("attackDamage")),
+                                Integer.parseInt(properties.getProperty("durability")),
+                                Integer.parseInt(properties.getProperty("enchantability")),
+                                Boolean.parseBoolean(properties.getProperty("isFireproof")));
                         break;
                     }
                 } else {
-                    hi = new HyperItem(Integer.parseInt(p.getProperty("stack")),
-                            Boolean.parseBoolean(p.getProperty("isHandheld")),
-                            Boolean.parseBoolean(p.getProperty("isFireproof")));
+                    item = new HyperItem(Integer.parseInt(properties.getProperty("stack")),
+                            Boolean.parseBoolean(properties.getProperty("isHandheld")),
+                            Boolean.parseBoolean(properties.getProperty("isFireproof")));
                 }
                 File recipeFile = new File(path + File.separator + itemName + "_recipe.json");
                 if (recipeFile.exists()) {
                     HyperRegistry.Recipe.add(namespaceName, itemName, recipeFile);
                 }
-                HyperRegistry.register(namespaceName, itemName, hi, p.getProperty("name"));
+                HyperRegistry.register(namespaceName, itemName, item, properties.getProperty("name"));
             } catch (Exception e) {
                 System.err.println("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
             }
