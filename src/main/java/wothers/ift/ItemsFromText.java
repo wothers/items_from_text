@@ -19,10 +19,12 @@ public class ItemsFromText implements ModInitializer {
     public static final String MOD_ID = "itemsfromtext";
     public static final Path MAIN_FOLDER = Paths.get(MOD_ID);
 
+    @Override
     public void onInitialize() {
         File[] subDirectories = {};
         if (MAIN_FOLDER.toFile().exists()) {
             subDirectories = MAIN_FOLDER.toFile().listFiles(new FileFilter() {
+                @Override
                 public boolean accept(File file) {
                     return file.isDirectory();
                 }
@@ -45,6 +47,7 @@ public class ItemsFromText implements ModInitializer {
         File[] txtFiles = {};
         if (path.toFile().exists()) {
             txtFiles = path.toFile().listFiles(new FilenameFilter() {
+                @Override
                 public boolean accept(File f, String s) {
                     return s.endsWith(".txt");
                 }
