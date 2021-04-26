@@ -13,8 +13,8 @@ import wothers.hr.HyperRegistry;
 
 @Mixin(Language.class)
 public class LanguageLoaderMixin {
-    @ModifyVariable(method = "load", at = @At(value = "INVOKE_ASSIGN"), index = 2)
-    private static JsonObject append(JsonObject jsonObject) {
+    @ModifyVariable(method = "load", at = @At(value = "INVOKE_ASSIGN"), ordinal = 0)
+    private static JsonObject appendJson(JsonObject jsonObject) {
         for (Map.Entry<String, String> entry : HyperRegistry.getLangMap().entrySet()) {
             jsonObject.addProperty(entry.getKey(), entry.getValue());
         }

@@ -67,6 +67,7 @@ public class ItemsFromText implements ModInitializer {
                         item = new HyperFood(Integer.parseInt(properties.getProperty("stack")),
                                 Integer.parseInt(properties.getProperty("hunger")),
                                 Float.parseFloat(properties.getProperty("saturation")),
+                                Boolean.parseBoolean(properties.getProperty("isSnack")),
                                 Boolean.parseBoolean(properties.getProperty("isHandheld")),
                                 Boolean.parseBoolean(properties.getProperty("isFireproof")));
                         break;
