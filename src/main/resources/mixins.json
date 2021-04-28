@@ -3,7 +3,12 @@
   "minVersion": "0.8",
   "package": "wothers.ift.mixins",
   "compatibilityLevel": "JAVA_8",
-  "mixins": ["LanguageLoaderMixin", "ModelLoaderMixin", "RecipeLoaderMixin"],
+  "mixins": [
+    "LanguageLoaderMixin",
+    "ModelLoaderMixin",
+    "RecipeLoaderMixin",
+    "TextureLoaderMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

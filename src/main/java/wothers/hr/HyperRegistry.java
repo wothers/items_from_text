@@ -53,4 +53,16 @@ public class HyperRegistry {
             return map;
         }
     }
+
+    public static class Texture {
+        private static Map<String, File> map = new HashMap<String, File>();
+
+        public static void add(String namespaceName, String itemName, File textureFile) throws Exception {
+            map.put(namespaceName + ":textures/item/" + itemName + ".png", textureFile);
+        }
+
+        public static Map<String, File> getMap() {
+            return map;
+        }
+    }
 }

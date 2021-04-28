@@ -91,6 +91,10 @@ public class ItemsFromText implements ModInitializer {
                 if (recipeFile.exists()) {
                     HyperRegistry.Recipe.add(namespaceName, itemName, recipeFile);
                 }
+                File textureFile = new File(path + File.separator + itemName + ".png");
+                if (textureFile.exists()) {
+                    HyperRegistry.Texture.add(namespaceName, itemName, textureFile);
+                }
                 HyperRegistry.register(namespaceName, itemName, item, properties.getProperty("name"));
             } catch (Exception e) {
                 System.err.println("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
