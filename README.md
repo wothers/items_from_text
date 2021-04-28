@@ -24,7 +24,7 @@ Optional for non tool items: "isHandheld" field (true or false) - is the item he
 
 Optional for all items: "isFireproof" field (true or false) - is the item immune to burning in fire or lava.
 
-Optional for food items: "isSnack" fild (true or false) - is the food consumed quickly.
+Optional for food items: "isSnack" field (true or false) - is the food consumed quickly.
 
 ## Basic Items:
 
