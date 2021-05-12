@@ -11,8 +11,7 @@ import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 
 public class HyperTool extends HyperItem {
-    public HyperTool(String toolType, float miningSpeed, int miningLevel, float attackSpeed, int attackDamage,
-            int durability, int enchantability, boolean isFireproof) {
+    public HyperTool(String toolType, float miningSpeed, int miningLevel, float attackSpeed, int attackDamage, int durability, int enchantability, boolean isFireproof) {
         super(1, true, isFireproof);
         attackSpeed -= 4;
 
@@ -49,29 +48,28 @@ public class HyperTool extends HyperItem {
         };
 
         Item.Settings settings = new Item.Settings().group(ItemGroup.TOOLS);
-        if (isFireproof) {
+        if (isFireproof)
             settings = settings.fireproof();
-        }
 
         switch (toolType) {
-        case "pickaxe":
-            item = new CustomPickaxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-            break;
-        case "axe":
-            item = new CustomAxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-            break;
-        case "shovel":
-            item = new ShovelItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-            break;
-        case "hoe":
-            item = new CustomHoeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-            break;
-        case "sword":
-            settings = settings.group(ItemGroup.COMBAT);
-            item = new SwordItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-            break;
-        default:
-            throw new RuntimeException("Invalid tool type - only pickaxe, axe, shovel, hoe or sword are permitted");
+            case "pickaxe":
+                item = new CustomPickaxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
+                break;
+            case "axe":
+                item = new CustomAxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
+                break;
+            case "shovel":
+                item = new ShovelItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
+                break;
+            case "hoe":
+                item = new CustomHoeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
+                break;
+            case "sword":
+                settings = settings.group(ItemGroup.COMBAT);
+                item = new SwordItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
+                break;
+            default:
+                throw new RuntimeException("Invalid tool type - only pickaxe, axe, shovel, hoe or sword are permitted");
         }
     }
 

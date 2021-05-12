@@ -12,7 +12,32 @@ Place the jar file in your minecraft directory (usually the .minecraft folder).
 2. For each item make a txt file and a png image. Both files should be named your item's registry name (e.g. ender_pearl)
 3. Inside the txt file complete one of the example templates below with your own item's data
 4. For custom namespaces, make a new folder within the main folder and put items in that folder
-5. To add a custom crafting recipe for the item, make a json file called "YOUR_ITEM_recipe.json" in the item's folder. The json must be in the same format as a recipe datapack json. I recommend using [this website to make the recipe](https://crafting.thedestruc7i0n.ca/)
+
+## Crafting Recipes
+
+Crafting recipes can either be shaped or shapeless.
+
+To give your item a custom crafting recipe, add a recipe property.
+
+Recipes must be defined like this:
+
+recipe=shaped,TOP ROW,MIDDLE ROW,BOTTOM ROW,QUANTITY,KEYS
+or
+recipe=shapeless,QUANTITY,ITEMS
+
+### Examples:
+
+Recipe for a Furnace
+
+```
+recipe=shaped,XXX,X X,XXX,1,X-minecraft:cobblestone
+```
+
+Recipe for Flint and Steel
+
+```
+recipe=shapeless,1,minecraft:flint,minecraft:iron_ingot
+```
 
 # Templates
 

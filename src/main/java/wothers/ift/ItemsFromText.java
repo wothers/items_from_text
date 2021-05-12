@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import net.fabricmc.api.ModInitializer;
 import wothers.hr.HyperRegistry;
 import wothers.hr.items.HyperFood;
@@ -18,6 +19,7 @@ import wothers.hr.items.HyperTool;
 public class ItemsFromText implements ModInitializer {
     public static final String MOD_ID = "itemsfromtext";
     public static final Path MAIN_FOLDER = Paths.get(MOD_ID);
+    public static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void onInitialize() {
@@ -37,7 +39,7 @@ public class ItemsFromText implements ModInitializer {
                 parseItems(file.toPath());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
     }
 
@@ -63,41 +65,22 @@ public class ItemsFromText implements ModInitializer {
             try {
                 if (properties.getProperty("type") != null) {
                     switch (properties.getProperty("type")) {
-                    case "food":
-                        item = new HyperFood(Integer.parseInt(properties.getProperty("stack")),
-                                Integer.parseInt(properties.getProperty("hunger")),
-                                Float.parseFloat(properties.getProperty("saturation")),
-                                Boolean.parseBoolean(properties.getProperty("isSnack")),
-                                Boolean.parseBoolean(properties.getProperty("isHandheld")),
-                                Boolean.parseBoolean(properties.getProperty("isFireproof")));
-                        break;
-                    case "tool":
-                        item = new HyperTool(properties.getProperty("toolType"),
-                                Float.parseFloat(properties.getProperty("miningSpeed")),
-                                Integer.parseInt(properties.getProperty("miningLevel")),
-                                Float.parseFloat(properties.getProperty("attackSpeed")),
-                                Integer.parseInt(properties.getProperty("attackDamage")),
-                                Integer.parseInt(properties.getProperty("durability")),
-                                Integer.parseInt(properties.getProperty("enchantability")),
-                                Boolean.parseBoolean(properties.getProperty("isFireproof")));
-                        break;
+                        case "food":
+                            item = new HyperFood(Integer.parseInt(properties.getProperty("stack")), Integer.parseInt(properties.getProperty("hunger")), Float.parseFloat(properties.getProperty("saturation")), Boolean.parseBoolean(properties.getProperty("isSnack")), Boolean.parseBoolean(properties.getProperty("isHandheld")), Boolean.parseBoolean(properties.getProperty("isFireproof")));
+                            break;
+                        case "tool":
+                            item = new HyperTool(properties.getProperty("toolType"), Float.parseFloat(properties.getProperty("miningSpeed")), Integer.parseInt(properties.getProperty("miningLevel")), Float.parseFloat(properties.getProperty("attackSpeed")), Integer.parseInt(properties.getProperty("attackDamage")), Integer.parseInt(properties.getProperty("durability")), Integer.parseInt(properties.getProperty("enchantability")), Boolean.parseBoolean(properties.getProperty("isFireproof")));
+                            break;
                     }
                 } else {
-                    item = new HyperItem(Integer.parseInt(properties.getProperty("stack")),
-                            Boolean.parseBoolean(properties.getProperty("isHandheld")),
-                            Boolean.parseBoolean(properties.getProperty("isFireproof")));
+                    item = new HyperItem(Integer.parseInt(properties.getProperty("stack")), Boolean.parseBoolean(properties.getProperty("isHandheld")), Boolean.parseBoolean(properties.getProperty("isFireproof")));
                 }
-                File recipeFile = new File(path + File.separator + itemName + "_recipe.json");
-                if (recipeFile.exists()) {
-                    HyperRegistry.Recipe.add(namespaceName, itemName, recipeFile);
-                }
-                File textureFile = new File(path + File.separator + itemName + ".png");
-                if (textureFile.exists()) {
-                    HyperRegistry.Texture.add(namespaceName, itemName, textureFile);
-                }
-                HyperRegistry.register(namespaceName, itemName, item, properties.getProperty("name"));
+                HyperRegistry.INSTANCE.register(namespaceName, itemName, item, properties.getProperty("name"));
+                if (properties.getProperty("recipe") != null)
+                    HyperRegistry.Recipe.INSTANCE.add(namespaceName, itemName, properties.getProperty("recipe"));
+                HyperRegistry.Texture.INSTANCE.add(namespaceName, itemName, new File(path + File.separator + itemName + ".png"));
             } catch (Exception e) {
-                System.err.println("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
+                LOGGER.error("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
             }
         }
     }
