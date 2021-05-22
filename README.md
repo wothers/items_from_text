@@ -51,6 +51,8 @@ Optional for all items: "isFireproof" field (true or false) - is the item immune
 
 Optional for food items: "isSnack" field (true or false) - is the food consumed quickly.
 
+Optional for tool items: "repairItem" field - the item that can repair the tool with an Anvil.
+
 ## Basic Items:
 
 ```

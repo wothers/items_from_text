@@ -1,9 +1,7 @@
 package wothers.ift;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,14 +22,8 @@ public class ItemsFromText implements ModInitializer {
     @Override
     public void onInitialize() {
         File[] subDirectories = {};
-        if (MAIN_FOLDER.toFile().exists()) {
-            subDirectories = MAIN_FOLDER.toFile().listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return file.isDirectory();
-                }
-            });
-        }
+        if (MAIN_FOLDER.toFile().exists())
+            subDirectories = MAIN_FOLDER.toFile().listFiles(File::isDirectory);
 
         try {
             parseItems(MAIN_FOLDER);
@@ -47,14 +39,8 @@ public class ItemsFromText implements ModInitializer {
         String namespaceName = path.toFile().getName();
 
         File[] txtFiles = {};
-        if (path.toFile().exists()) {
-            txtFiles = path.toFile().listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File f, String s) {
-                    return s.endsWith(".txt");
-                }
-            });
-        }
+        if (path.toFile().exists())
+            txtFiles = path.toFile().listFiles((file, string) -> string.endsWith(".txt"));
 
         for (File file : txtFiles) {
             Properties properties = new Properties();
@@ -69,7 +55,7 @@ public class ItemsFromText implements ModInitializer {
                             item = new HyperFood(Integer.parseInt(properties.getProperty("stack")), Integer.parseInt(properties.getProperty("hunger")), Float.parseFloat(properties.getProperty("saturation")), Boolean.parseBoolean(properties.getProperty("isSnack")), Boolean.parseBoolean(properties.getProperty("isHandheld")), Boolean.parseBoolean(properties.getProperty("isFireproof")));
                             break;
                         case "tool":
-                            item = new HyperTool(properties.getProperty("toolType"), Float.parseFloat(properties.getProperty("miningSpeed")), Integer.parseInt(properties.getProperty("miningLevel")), Float.parseFloat(properties.getProperty("attackSpeed")), Integer.parseInt(properties.getProperty("attackDamage")), Integer.parseInt(properties.getProperty("durability")), Integer.parseInt(properties.getProperty("enchantability")), Boolean.parseBoolean(properties.getProperty("isFireproof")));
+                            item = new HyperTool(properties.getProperty("toolType"), Float.parseFloat(properties.getProperty("miningSpeed")), Integer.parseInt(properties.getProperty("miningLevel")), Float.parseFloat(properties.getProperty("attackSpeed")), Integer.parseInt(properties.getProperty("attackDamage")), Integer.parseInt(properties.getProperty("durability")), Integer.parseInt(properties.getProperty("enchantability")), properties.getProperty("repairItem"), Boolean.parseBoolean(properties.getProperty("isFireproof")));
                             break;
                     }
                 } else {

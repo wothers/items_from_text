@@ -9,13 +9,23 @@ import net.minecraft.item.ShovelItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class HyperTool extends HyperItem {
-    public HyperTool(String toolType, float miningSpeed, int miningLevel, float attackSpeed, int attackDamage, int durability, int enchantability, boolean isFireproof) {
-        super(1, true, isFireproof);
-        attackSpeed -= 4;
+    private final String toolType;
+    private final int attackDamage;
+    private final float attackSpeed;
+    private final ToolMaterial customToolMaterial;
 
-        ToolMaterial customToolMaterial = new ToolMaterial() {
+    public HyperTool(String toolType, float miningSpeed, int miningLevel, float attackSpeed, int attackDamage, int durability, int enchantability, String repairItem, boolean isFireproof) {
+        super(1, true, isFireproof);
+        this.toolType = toolType;
+        this.attackDamage = attackDamage;
+        attackSpeed -= 4;
+        this.attackSpeed = attackSpeed;
+
+        customToolMaterial = new ToolMaterial() {
             @Override
             public int getDurability() {
                 return durability;
@@ -43,31 +53,29 @@ public class HyperTool extends HyperItem {
 
             @Override
             public Ingredient getRepairIngredient() {
-                return null;
+                return repairItem != null ? Ingredient.ofItems(Registry.ITEM.get(new Identifier(repairItem))) : Ingredient.EMPTY;
             }
         };
+    }
 
+    @Override
+    public Item getItem() {
         Item.Settings settings = new Item.Settings().group(ItemGroup.TOOLS);
         if (isFireproof)
             settings = settings.fireproof();
 
         switch (toolType) {
             case "pickaxe":
-                item = new CustomPickaxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-                break;
+                return new CustomPickaxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
             case "axe":
-                item = new CustomAxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-                break;
+                return new CustomAxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
             case "shovel":
-                item = new ShovelItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-                break;
+                return new ShovelItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
             case "hoe":
-                item = new CustomHoeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-                break;
+                return new CustomHoeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
             case "sword":
                 settings = settings.group(ItemGroup.COMBAT);
-                item = new SwordItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
-                break;
+                return new SwordItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
             default:
                 throw new RuntimeException("Invalid tool type - only pickaxe, axe, shovel, hoe or sword are permitted");
         }
