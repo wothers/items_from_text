@@ -30,7 +30,7 @@ public class HyperRegistry {
         if (displayName == null)
             throw new RuntimeException("Missing item display name");
         Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
-        langMap.put(item.getItem().getTranslationKey(), displayName);
+        langMap.put("item." + namespaceName + "." + itemName, displayName);
         registeredItems.put(namespaceName + ":item/" + itemName, item.isHandheld ? "handheld" : "generated");
     }
 
