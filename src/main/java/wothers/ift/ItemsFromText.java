@@ -49,19 +49,37 @@ public class ItemsFromText implements ModInitializer {
 
             HyperItem item = null;
             try {
+                boolean isFireproof = Boolean.parseBoolean(properties.getProperty("isFireproof"));
+                boolean isHandheld = Boolean.parseBoolean(properties.getProperty("isHandheld"));
                 if (properties.getProperty("type") != null) {
                     switch (properties.getProperty("type")) {
                         case "food":
-                            item = new HyperFood(Integer.parseInt(properties.getProperty("stack")), Integer.parseInt(properties.getProperty("hunger")), Float.parseFloat(properties.getProperty("saturation")), Boolean.parseBoolean(properties.getProperty("isSnack")), Boolean.parseBoolean(properties.getProperty("isHandheld")), Boolean.parseBoolean(properties.getProperty("isFireproof")));
+                            int hunger = Integer.parseInt(properties.getProperty("hunger"));
+                            float saturation = Float.parseFloat(properties.getProperty("saturation"));
+                            boolean isSnack = Boolean.parseBoolean(properties.getProperty("isSnack"));
+                            item = new HyperFood(Integer.parseInt(properties.getProperty("stack")), hunger, saturation, isSnack, isFireproof);
                             break;
                         case "tool":
-                            item = new HyperTool(properties.getProperty("toolType"), Float.parseFloat(properties.getProperty("miningSpeed")), Integer.parseInt(properties.getProperty("miningLevel")), Float.parseFloat(properties.getProperty("attackSpeed")), Integer.parseInt(properties.getProperty("attackDamage")), Integer.parseInt(properties.getProperty("durability")), Integer.parseInt(properties.getProperty("enchantability")), properties.getProperty("repairItem"), Boolean.parseBoolean(properties.getProperty("isFireproof")));
+                            float miningSpeed = Float.parseFloat(properties.getProperty("miningSpeed"));
+                            int miningLevel = Integer.parseInt(properties.getProperty("miningLevel"));
+                            float attackSpeed = Float.parseFloat(properties.getProperty("attackSpeed"));
+                            int attackDamage = Integer.parseInt(properties.getProperty("attackDamage"));
+                            int durability = Integer.parseInt(properties.getProperty("durability"));
+                            int enchantability = Integer.parseInt(properties.getProperty("enchantability"));
+                            item = new HyperTool(properties.getProperty("toolType"), miningSpeed, miningLevel, attackSpeed, attackDamage, durability, enchantability, properties.getProperty("repairItem"), isFireproof);
+                            isHandheld = true;
                             break;
                     }
                 } else {
-                    item = new HyperItem(Integer.parseInt(properties.getProperty("stack")), Boolean.parseBoolean(properties.getProperty("isHandheld")), Boolean.parseBoolean(properties.getProperty("isFireproof")));
+                    item = new HyperItem(Integer.parseInt(properties.getProperty("stack")), isFireproof);
                 }
-                HyperRegistry.INSTANCE.register(namespaceName, itemName, item, properties.getProperty("name"));
+                HyperRegistry.INSTANCE.register(namespaceName, itemName, item, properties.getProperty("name"), isHandheld);
+                if (properties.getProperty("cookingTime") != null)
+                    try {
+                        HyperRegistry.INSTANCE.addFuel(item, Short.parseShort(properties.getProperty("cookingTime")));
+                    } catch (NumberFormatException e) {
+                        LOGGER.warn("Error parsing cooking time for item: " + namespaceName + ":" + itemName);
+                    }
                 if (properties.getProperty("recipe") != null)
                     HyperRegistry.Recipe.INSTANCE.add(namespaceName, itemName, properties.getProperty("recipe"));
                 HyperRegistry.Texture.INSTANCE.add(namespaceName, itemName, new File(path + File.separator + itemName + ".png"));

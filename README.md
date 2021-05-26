@@ -45,9 +45,11 @@ Each item has a name field that represents the display name of the item.
 
 Most items (apart from tools) have a stack field which represents the max stack size.
 
-Optional for non tool items: "isHandheld" field (true or false) - is the item held like a stick or tool.
-
 Optional for all items: "isFireproof" field (true or false) - is the item immune to burning in fire or lava.
+
+Optional for all items: "cookingTime" field (integer value) - marks the item as a fuel that cooks for the amount of ticks specified.
+
+Optional for non tool items: "isHandheld" field (true or false) - is the item held like a stick or tool.
 
 Optional for food items: "isSnack" field (true or false) - is the food consumed quickly.
 

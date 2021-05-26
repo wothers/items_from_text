@@ -9,8 +9,8 @@ public class HyperFood extends HyperItem {
     private final float saturation;
     private final boolean isSnack;
 
-    public HyperFood(int maxStackSize, int hunger, float saturation, boolean isSnack, boolean isHandheld, boolean isFireproof) {
-        super(maxStackSize, isHandheld, isFireproof);
+    public HyperFood(int maxStackSize, int hunger, float saturation, boolean isSnack, boolean isFireproof) {
+        super(maxStackSize, isFireproof);
         this.hunger = hunger;
         this.saturation = saturation;
         this.isSnack = isSnack;
@@ -18,12 +18,15 @@ public class HyperFood extends HyperItem {
 
     @Override
     public Item getItem() {
-        Item.Settings settings = new Item.Settings().group(ItemGroup.FOOD).maxCount(maxStackSize);
-        if (isFireproof)
-            settings = settings.fireproof();
-        FoodComponent.Builder builder = new FoodComponent.Builder().hunger(hunger).saturationModifier(saturation);
-        if (isSnack)
-            builder = builder.snack();
-        return new Item(settings.food(builder.build()));
+        if (item == null) {
+            Item.Settings settings = new Item.Settings().group(ItemGroup.FOOD).maxCount(maxStackSize);
+            if (isFireproof)
+                settings = settings.fireproof();
+            FoodComponent.Builder builder = new FoodComponent.Builder().hunger(hunger).saturationModifier(saturation);
+            if (isSnack)
+                builder = builder.snack();
+            item = new Item(settings.food(builder.build()));
+        }
+        return item;
     }
 }

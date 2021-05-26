@@ -8,6 +8,7 @@ import java.util.Map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import wothers.hr.items.HyperItem;
@@ -18,20 +19,26 @@ public class HyperRegistry {
 
     private Map<String, String> langMap;
     private Map<String, String> registeredItems;
+    private Map<Item, Integer> fuelMap;
 
     public HyperRegistry() {
         langMap = new HashMap<>();
         registeredItems = new HashMap<>();
+        fuelMap = new HashMap<>();
     }
 
-    public void register(String namespaceName, String itemName, HyperItem item, String displayName) {
+    public void register(String namespaceName, String itemName, HyperItem item, String displayName, Boolean isHandheld) {
         if (registeredItems.containsKey(namespaceName + ":item/" + itemName))
             throw new RuntimeException("Duplicate item");
         if (displayName == null)
             throw new RuntimeException("Missing item display name");
         Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
         langMap.put("item." + namespaceName + "." + itemName, displayName);
-        registeredItems.put(namespaceName + ":item/" + itemName, item.isHandheld ? "handheld" : "generated");
+        registeredItems.put(namespaceName + ":item/" + itemName, isHandheld ? "handheld" : "generated");
+    }
+
+    public void addFuel(HyperItem item, short cookingTime) {
+        fuelMap.put(item.getItem(), (int) cookingTime);
     }
 
     public Map<String, String> getLangMap() {
@@ -40,6 +47,10 @@ public class HyperRegistry {
 
     public Map<String, String> getRegisteredItems() {
         return new HashMap<>(registeredItems);
+    }
+
+    public Map<Item, Integer> getFuelMap() {
+        return new HashMap<>(fuelMap);
     }
 
     public static class Recipe {

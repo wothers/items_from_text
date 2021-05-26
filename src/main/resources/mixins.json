@@ -4,6 +4,7 @@
   "package": "wothers.ift.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "FuelLoaderMixin",
     "LanguageLoaderMixin",
     "ModelLoaderMixin",
     "RecipeLoaderMixin",
