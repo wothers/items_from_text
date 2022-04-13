@@ -1,9 +1,7 @@
 package wothers.hr;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -14,14 +12,14 @@ import net.minecraft.util.registry.Registry;
 import wothers.hr.items.HyperItem;
 import wothers.ift.ItemsFromText;
 
-public class HyperRegistry {
-    public static HyperRegistry INSTANCE = new HyperRegistry();
+public final class HyperRegistry {
+    public static final HyperRegistry INSTANCE = new HyperRegistry();
 
     private Map<String, String> langMap;
     private Map<String, String> registeredItems;
     private Map<Item, Integer> fuelMap;
 
-    public HyperRegistry() {
+    private HyperRegistry() {
         langMap = new HashMap<>();
         registeredItems = new HashMap<>();
         fuelMap = new HashMap<>();
@@ -53,12 +51,12 @@ public class HyperRegistry {
         return new HashMap<>(fuelMap);
     }
 
-    public static class Recipe {
-        public static Recipe INSTANCE = new Recipe();
+    public static final class Recipe {
+        public static final Recipe INSTANCE = new Recipe();
 
         private Map<Identifier, JsonElement> map;
 
-        public Recipe() {
+        private Recipe() {
             map = new HashMap<>();
         }
 
@@ -81,20 +79,20 @@ public class HyperRegistry {
             JsonObject keysObject = new JsonObject();
             JsonObject resultObject = new JsonObject();
 
-            List<String> subStrings = getSubStrings(recipe);
+            String[] subStrings = recipe.split(",");
 
             resultObject.addProperty("item", namespaceName + ":" + itemName);
-            for (int i = 0; i < subStrings.size(); i++) {
-                if (isNumeric(subStrings.get(i))) {
-                    resultObject.addProperty("count", Integer.parseInt(subStrings.get(i)));
-                    for (int j = i + 1; j < subStrings.size(); j++) {
+            for (int i = 0; i < subStrings.length; i++) {
+                if (isNumeric(subStrings[i])) {
+                    resultObject.addProperty("count", Integer.parseInt(subStrings[i]));
+                    for (int j = i + 1; j < subStrings.length; j++) {
                         JsonObject keyObject = new JsonObject();
-                        keyObject.addProperty("item", subStrings.get(j).substring(2));
-                        keysObject.add(Character.toString(subStrings.get(j).charAt(0)), keyObject);
+                        keyObject.addProperty("item", subStrings[j].substring(2));
+                        keysObject.add(Character.toString(subStrings[j].charAt(0)), keyObject);
                     }
                     break;
                 }
-                patternArray.add(subStrings.get(i));
+                patternArray.add(subStrings[i]);
             }
 
             mainObject.addProperty("type", "minecraft:crafting_shaped");
@@ -110,13 +108,13 @@ public class HyperRegistry {
             JsonArray ingredientArray = new JsonArray();
             JsonObject resultObject = new JsonObject();
 
-            List<String> subStrings = getSubStrings(recipe);
+            String[] subStrings = recipe.split(",");
 
             resultObject.addProperty("item", namespaceName + ":" + itemName);
-            resultObject.addProperty("count", Integer.parseInt(subStrings.get(0)));
-            for (int i = 1; i < subStrings.size(); i++) {
+            resultObject.addProperty("count", Integer.parseInt(subStrings[0]));
+            for (int i = 1; i < subStrings.length; i++) {
                 JsonObject ingredientObject = new JsonObject();
-                ingredientObject.addProperty("item", subStrings.get(i));
+                ingredientObject.addProperty("item", subStrings[i]);
                 ingredientArray.add(ingredientObject);
             }
 
@@ -125,24 +123,6 @@ public class HyperRegistry {
             mainObject.add("result", resultObject);
 
             map.put(new Identifier(namespaceName, itemName), mainObject);
-        }
-
-        private List<String> getSubStrings(String input) {
-            List<String> result = new ArrayList<>();
-            int length = input.length();
-            int index = 0;
-            int start = 0;
-            while (index < length) {
-                if (input.charAt(index) == ',') {
-                    result.add(input.substring(start, index));
-                    start = index + 1;
-                } else if (index == length - 1) {
-                    result.add(input.substring(start, index + 1));
-                    break;
-                }
-                index++;
-            }
-            return result;
         }
 
         private boolean isNumeric(String input) {
@@ -159,12 +139,12 @@ public class HyperRegistry {
         }
     }
 
-    public static class Texture {
-        public static Texture INSTANCE = new Texture();
+    public static final class Texture {
+        public static final Texture INSTANCE = new Texture();
 
         private Map<String, File> map;
 
-        public Texture() {
+        private Texture() {
             map = new HashMap<>();
         }
 
