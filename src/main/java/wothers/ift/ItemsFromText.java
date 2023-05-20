@@ -1,17 +1,17 @@
 package wothers.ift;
 
+import net.fabricmc.api.ModInitializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import wothers.hr.HyperRegistry;
+import wothers.hr.items.HyperFood;
+import wothers.hr.items.HyperItem;
+import wothers.hr.items.HyperTool;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Properties;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import net.fabricmc.api.ModInitializer;
-import wothers.hr.HyperRegistry;
-import wothers.hr.items.HyperFood;
-import wothers.hr.items.HyperItem;
-import wothers.hr.items.HyperTool;
 
 public class ItemsFromText implements ModInitializer {
     public static final String MOD_ID = "itemsfromtext";
@@ -21,8 +21,7 @@ public class ItemsFromText implements ModInitializer {
     @Override
     public void onInitialize() {
         File[] subDirectories = {};
-        if (MAIN_FOLDER.exists())
-            subDirectories = MAIN_FOLDER.listFiles(File::isDirectory);
+        if (MAIN_FOLDER.exists()) subDirectories = MAIN_FOLDER.listFiles(File::isDirectory);
 
         parseItems(MAIN_FOLDER);
         for (File dir : subDirectories) {
@@ -34,8 +33,7 @@ public class ItemsFromText implements ModInitializer {
         String namespaceName = dir.getName();
 
         File[] txtFiles = {};
-        if (dir.exists())
-            txtFiles = dir.listFiles((file, string) -> string.endsWith(".txt"));
+        if (dir.exists()) txtFiles = dir.listFiles((file, string) -> string.endsWith(".txt"));
 
         for (File file : txtFiles) {
             String itemName = file.getName().replace(".txt", "");
@@ -88,14 +86,12 @@ public class ItemsFromText implements ModInitializer {
             }
 
             HyperRegistry.INSTANCE.register(namespaceName, itemName, item, p.getProperty("name"), isHandheld);
-            if (p.getProperty("cookingTime") != null)
-                try {
-                    HyperRegistry.INSTANCE.addFuel(item, Short.parseShort(p.getProperty("cookingTime")));
-                } catch (NumberFormatException e) {
-                    LOGGER.warn("Error parsing cooking time for item: " + namespaceName + ":" + itemName);
-                }
-            if (p.getProperty("recipe") != null)
-                HyperRegistry.Recipe.INSTANCE.add(namespaceName, itemName, p.getProperty("recipe"));
+            if (p.getProperty("cookingTime") != null) try {
+                HyperRegistry.INSTANCE.addFuel(item, Short.parseShort(p.getProperty("cookingTime")));
+            } catch (NumberFormatException e) {
+                LOGGER.warn("Error parsing cooking time for item: " + namespaceName + ":" + itemName);
+            }
+            if (p.getProperty("recipe") != null) HyperRegistry.Recipe.INSTANCE.add(namespaceName, itemName, p.getProperty("recipe"));
         } catch (RuntimeException e) {
             LOGGER.error("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
         }

@@ -35,13 +35,10 @@ public class HyperFood extends HyperItem {
     public Item getItem() {
         if (item == null) {
             Item.Settings settings = new Item.Settings().group(ItemGroup.FOOD).maxCount(maxStackSize);
-            if (isFireproof)
-                settings = settings.fireproof();
+            if (isFireproof) settings = settings.fireproof();
             FoodComponent.Builder builder = new FoodComponent.Builder().hunger(hunger).saturationModifier(saturation);
-            if (isSnack)
-                builder = builder.snack();
-            if (effect != null)
-                builder = builder.statusEffect(new StatusEffectInstance(Registry.STATUS_EFFECT.get(new Identifier(effect)), effectDuration, effectAmplifier), effectChance);
+            if (isSnack) builder = builder.snack();
+            if (effect != null) builder = builder.statusEffect(new StatusEffectInstance(Registry.STATUS_EFFECT.get(new Identifier(effect)), effectDuration, effectAmplifier), effectChance);
             item = new Item(settings.food(builder.build()));
         }
         return item;

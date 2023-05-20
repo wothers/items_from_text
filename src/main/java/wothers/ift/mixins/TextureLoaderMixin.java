@@ -1,16 +1,16 @@
 package wothers.ift.mixins;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceImpl;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import wothers.hr.HyperRegistry;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 @Mixin(SpriteAtlasTexture.class)
 public class TextureLoaderMixin {

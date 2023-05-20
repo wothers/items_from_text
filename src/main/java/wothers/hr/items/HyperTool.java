@@ -1,13 +1,6 @@
 package wothers.hr.items;
 
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.HoeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.ShovelItem;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.ToolMaterial;
+import net.minecraft.item.*;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -62,8 +55,7 @@ public class HyperTool extends HyperItem {
     public Item getItem() {
         if (item == null) {
             Item.Settings settings = new Item.Settings().group(ItemGroup.TOOLS);
-            if (isFireproof)
-                settings = settings.fireproof();
+            if (isFireproof) settings = settings.fireproof();
             switch (toolType) {
                 case "pickaxe":
                     item = new CustomPickaxeItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);

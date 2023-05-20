@@ -1,12 +1,12 @@
 package wothers.ift.mixins;
 
-import java.util.Map;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.item.Item;
 import wothers.hr.HyperRegistry;
+import java.util.Map;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public class FuelLoaderMixin {

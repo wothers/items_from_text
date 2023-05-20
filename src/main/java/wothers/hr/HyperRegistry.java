@@ -1,8 +1,5 @@
 package wothers.hr;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,6 +8,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import wothers.hr.items.HyperItem;
 import wothers.ift.ItemsFromText;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class HyperRegistry {
     public static final HyperRegistry INSTANCE = new HyperRegistry();
@@ -26,10 +26,8 @@ public final class HyperRegistry {
     }
 
     public void register(String namespaceName, String itemName, HyperItem item, String displayName, Boolean isHandheld) {
-        if (registeredItems.containsKey(namespaceName + ":item/" + itemName))
-            throw new RuntimeException("Duplicate item");
-        if (displayName == null)
-            throw new RuntimeException("Missing item display name");
+        if (registeredItems.containsKey(namespaceName + ":item/" + itemName)) throw new RuntimeException("Duplicate item");
+        if (displayName == null) throw new RuntimeException("Missing item display name");
         Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
         langMap.put("item." + namespaceName + "." + itemName, displayName);
         registeredItems.put(namespaceName + ":item/" + itemName, isHandheld ? "handheld" : "generated");
@@ -62,12 +60,9 @@ public final class HyperRegistry {
 
         public void add(String namespaceName, String itemName, String recipe) {
             try {
-                if (recipe.startsWith("shaped,"))
-                    resolveShapedRecipe(namespaceName, itemName, recipe.replace("shaped,", ""));
-                else if (recipe.startsWith("shapeless,"))
-                    resolveShapelessRecipe(namespaceName, itemName, recipe.replace("shapeless,", ""));
-                else
-                    throw new RuntimeException();
+                if (recipe.startsWith("shaped,")) resolveShapedRecipe(namespaceName, itemName, recipe.replace("shaped,", ""));
+                else if (recipe.startsWith("shapeless,")) resolveShapelessRecipe(namespaceName, itemName, recipe.replace("shapeless,", ""));
+                else throw new RuntimeException();
             } catch (Exception e) {
                 ItemsFromText.LOGGER.warn("Failed to resolve recipe for: " + namespaceName + ":" + itemName);
             }
@@ -149,8 +144,7 @@ public final class HyperRegistry {
         }
 
         public void add(String namespaceName, String itemName, File textureFile) {
-            if (textureFile.exists())
-                map.put(namespaceName + ":textures/item/" + itemName + ".png", textureFile);
+            if (textureFile.exists()) map.put(namespaceName + ":textures/item/" + itemName + ".png", textureFile);
         }
 
         public Map<String, File> getMap() {
