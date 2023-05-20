@@ -62,7 +62,15 @@ public class ItemsFromText implements ModInitializer {
                         int hunger = Integer.parseInt(p.getProperty("hunger"));
                         float saturation = Float.parseFloat(p.getProperty("saturation"));
                         boolean isSnack = Boolean.parseBoolean(p.getProperty("isSnack"));
-                        item = new HyperFood(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, isFireproof);
+                        String effect = p.getProperty("effect");
+                        if (effect != null) {
+                            int effectDuration = Integer.parseInt(p.getProperty("effectDuration"));
+                            int effectAmplifier = Integer.parseInt(p.getProperty("effectAmplifier"));
+                            float effectChance = Float.parseFloat(p.getProperty("effectChance"));
+                            item = new HyperFood(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, effect, effectDuration, effectAmplifier, effectChance, isFireproof);
+                        } else {
+                            item = new HyperFood(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, isFireproof);
+                        }
                         break;
                     case "tool":
                         float miningSpeed = Float.parseFloat(p.getProperty("miningSpeed"));
