@@ -1,4 +1,4 @@
-package wothers.hr;
+package wothers.ift;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,26 +6,26 @@ import com.google.gson.JsonObject;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import wothers.hr.items.HyperItem;
-import wothers.ift.ItemsFromText;
+import wothers.ift.items.ItemProvider;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class HyperRegistry {
-    public static final HyperRegistry INSTANCE = new HyperRegistry();
+public final class ItemRegistry {
+    public static final ItemRegistry INSTANCE = new ItemRegistry();
 
-    private Map<String, String> langMap;
-    private Map<String, String> registeredItems;
-    private Map<Item, Integer> fuelMap;
+    private final Map<String, String> langMap;
+    private final Map<String, String> registeredItems;
+    private final Map<Item, Integer> fuelMap;
 
-    private HyperRegistry() {
+    private ItemRegistry() {
         langMap = new HashMap<>();
         registeredItems = new HashMap<>();
         fuelMap = new HashMap<>();
     }
 
-    public void register(String namespaceName, String itemName, HyperItem item, String displayName, Boolean isHandheld) {
+    public void register(String namespaceName, String itemName, ItemProvider item, String displayName, Boolean isHandheld) {
         if (registeredItems.containsKey(namespaceName + ":item/" + itemName)) throw new RuntimeException("Duplicate item");
         if (displayName == null) throw new RuntimeException("Missing item display name");
         Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
@@ -33,26 +33,26 @@ public final class HyperRegistry {
         registeredItems.put(namespaceName + ":item/" + itemName, isHandheld ? "handheld" : "generated");
     }
 
-    public void addFuel(HyperItem item, short cookingTime) {
+    public void addFuel(ItemProvider item, short cookingTime) {
         fuelMap.put(item.getItem(), (int) cookingTime);
     }
 
     public Map<String, String> getLangMap() {
-        return new HashMap<>(langMap);
+        return Collections.unmodifiableMap(langMap);
     }
 
     public Map<String, String> getRegisteredItems() {
-        return new HashMap<>(registeredItems);
+        return Collections.unmodifiableMap(registeredItems);
     }
 
     public Map<Item, Integer> getFuelMap() {
-        return new HashMap<>(fuelMap);
+        return Collections.unmodifiableMap(fuelMap);
     }
 
     public static final class Recipe {
         public static final Recipe INSTANCE = new Recipe();
 
-        private Map<Identifier, JsonElement> map;
+        private final Map<Identifier, JsonElement> map;
 
         private Recipe() {
             map = new HashMap<>();
@@ -130,14 +130,14 @@ public final class HyperRegistry {
         }
 
         public Map<Identifier, JsonElement> getMap() {
-            return new HashMap<>(map);
+            return Collections.unmodifiableMap(map);
         }
     }
 
     public static final class Texture {
         public static final Texture INSTANCE = new Texture();
 
-        private Map<String, File> map;
+        private final Map<String, File> map;
 
         private Texture() {
             map = new HashMap<>();
@@ -148,7 +148,7 @@ public final class HyperRegistry {
         }
 
         public Map<String, File> getMap() {
-            return new HashMap<>(map);
+            return Collections.unmodifiableMap(map);
         }
     }
 }

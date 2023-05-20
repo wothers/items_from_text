@@ -3,10 +3,9 @@ package wothers.ift;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import wothers.hr.HyperRegistry;
-import wothers.hr.items.HyperFood;
-import wothers.hr.items.HyperItem;
-import wothers.hr.items.HyperTool;
+import wothers.ift.items.FoodItemWrapper;
+import wothers.ift.items.ItemWrapper;
+import wothers.ift.items.ToolItemWrapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class ItemsFromText implements ModInitializer {
                 Properties p = new Properties();
                 p.load(new FileReader(file));
                 parseItem(namespaceName, itemName, p);
-                HyperRegistry.Texture.INSTANCE.add(namespaceName, itemName, new File(dir.getAbsolutePath() + File.separator + itemName + ".png"));
+                ItemRegistry.Texture.INSTANCE.add(namespaceName, itemName, new File(dir.getAbsolutePath() + File.separator + itemName + ".png"));
             } catch (IOException e) {
                 LOGGER.error("I/O error while reading from file: " + file.getAbsolutePath());
             }
@@ -51,7 +50,7 @@ public class ItemsFromText implements ModInitializer {
 
     private void parseItem(String namespaceName, String itemName, Properties p) {
         try {
-            HyperItem item = null;
+            ItemWrapper item = null;
             boolean isFireproof = Boolean.parseBoolean(p.getProperty("isFireproof"));
             boolean isHandheld = Boolean.parseBoolean(p.getProperty("isHandheld"));
             if (p.getProperty("type") != null) {
@@ -65,9 +64,9 @@ public class ItemsFromText implements ModInitializer {
                             int effectDuration = Integer.parseInt(p.getProperty("effectDuration"));
                             int effectAmplifier = Integer.parseInt(p.getProperty("effectAmplifier"));
                             float effectChance = Float.parseFloat(p.getProperty("effectChance"));
-                            item = new HyperFood(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, effect, effectDuration, effectAmplifier, effectChance, isFireproof);
+                            item = new FoodItemWrapper(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, effect, effectDuration, effectAmplifier, effectChance, isFireproof);
                         } else {
-                            item = new HyperFood(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, isFireproof);
+                            item = new FoodItemWrapper(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, isFireproof);
                         }
                         break;
                     case "tool":
@@ -77,21 +76,21 @@ public class ItemsFromText implements ModInitializer {
                         int attackDamage = Integer.parseInt(p.getProperty("attackDamage"));
                         int durability = Integer.parseInt(p.getProperty("durability"));
                         int enchantability = Integer.parseInt(p.getProperty("enchantability"));
-                        item = new HyperTool(p.getProperty("toolType"), miningSpeed, miningLevel, attackSpeed, attackDamage, durability, enchantability, p.getProperty("repairItem"), isFireproof);
+                        item = new ToolItemWrapper(p.getProperty("toolType"), miningSpeed, miningLevel, attackSpeed, attackDamage, durability, enchantability, p.getProperty("repairItem"), isFireproof);
                         isHandheld = true;
                         break;
                 }
             } else {
-                item = new HyperItem(Integer.parseInt(p.getProperty("stack")), isFireproof);
+                item = new ItemWrapper(Integer.parseInt(p.getProperty("stack")), isFireproof);
             }
 
-            HyperRegistry.INSTANCE.register(namespaceName, itemName, item, p.getProperty("name"), isHandheld);
+            ItemRegistry.INSTANCE.register(namespaceName, itemName, item, p.getProperty("name"), isHandheld);
             if (p.getProperty("cookingTime") != null) try {
-                HyperRegistry.INSTANCE.addFuel(item, Short.parseShort(p.getProperty("cookingTime")));
+                ItemRegistry.INSTANCE.addFuel(item, Short.parseShort(p.getProperty("cookingTime")));
             } catch (NumberFormatException e) {
                 LOGGER.warn("Error parsing cooking time for item: " + namespaceName + ":" + itemName);
             }
-            if (p.getProperty("recipe") != null) HyperRegistry.Recipe.INSTANCE.add(namespaceName, itemName, p.getProperty("recipe"));
+            if (p.getProperty("recipe") != null) ItemRegistry.Recipe.INSTANCE.add(namespaceName, itemName, p.getProperty("recipe"));
         } catch (RuntimeException e) {
             LOGGER.error("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
         }
