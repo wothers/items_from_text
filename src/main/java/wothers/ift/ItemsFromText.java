@@ -3,27 +3,23 @@ package wothers.ift;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import wothers.ift.items.FoodItemWrapper;
-import wothers.ift.items.ItemProvider;
-import wothers.ift.items.ItemWrapper;
-import wothers.ift.items.ToolItemWrapper;
+import wothers.ift.items.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 public class ItemsFromText implements ModInitializer {
     public static final String MOD_ID = "itemsfromtext";
-    public static final File MAIN_FOLDER = Paths.get(MOD_ID).toFile();
+    public static final File MAIN_DIR = new File(MOD_ID);
     public static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void onInitialize() {
         File[] subDirectories = {};
-        if (MAIN_FOLDER.exists()) subDirectories = MAIN_FOLDER.listFiles(File::isDirectory);
+        if (MAIN_DIR.exists()) subDirectories = MAIN_DIR.listFiles(File::isDirectory);
 
-        loadItems(MAIN_FOLDER);
+        loadItems(MAIN_DIR);
         for (File dir : subDirectories) {
             loadItems(dir);
         }
@@ -39,57 +35,40 @@ public class ItemsFromText implements ModInitializer {
             String itemName = file.getName().replace(".txt", "");
 
             try {
-                Properties p = new Properties();
-                p.load(new FileReader(file));
-                registerItem(parseItem(p), namespaceName, itemName, p, new File(dir.getAbsolutePath() + File.separator + itemName + ".png"));
+                ItemProperties ip = ItemPropertiesFactory.create(newProperties(file), namespaceName, itemName, LOGGER);
+                ItemProvider item = parseItem(ip);
+                registerItem(item, ip, namespaceName, itemName, new File(dir.getAbsolutePath() + File.separator + itemName + ".png"));
             } catch (IOException e) {
                 LOGGER.error("I/O error while reading from file: " + file.getAbsolutePath());
-            } catch (RuntimeException e) {
-                LOGGER.error("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
+            } catch (ItemLoadException e) {
+                LOGGER.error(e.getMessage());
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(ItemLoadException.getErrorMessage(namespaceName, itemName, e.getMessage()));
             }
         }
     }
 
-    private ItemProvider parseItem(Properties p) {
-        boolean isFireproof = Boolean.parseBoolean(p.getProperty("isFireproof"));
-        if (p.getProperty("type") != null) switch (p.getProperty("type")) {
-            case "food":
-                int hunger = Integer.parseInt(p.getProperty("hunger"));
-                float saturation = Float.parseFloat(p.getProperty("saturation"));
-                boolean isSnack = Boolean.parseBoolean(p.getProperty("isSnack"));
-                String effect = p.getProperty("effect");
-                if (effect != null) {
-                    int effectDuration = Integer.parseInt(p.getProperty("effectDuration"));
-                    int effectAmplifier = Integer.parseInt(p.getProperty("effectAmplifier"));
-                    float effectChance = Float.parseFloat(p.getProperty("effectChance"));
-                    return new FoodItemWrapper(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, effect, effectDuration, effectAmplifier, effectChance, isFireproof);
-                } else {
-                    return new FoodItemWrapper(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, isFireproof);
-                }
-            case "tool":
-                float miningSpeed = Float.parseFloat(p.getProperty("miningSpeed"));
-                int miningLevel = Integer.parseInt(p.getProperty("miningLevel"));
-                float attackSpeed = Float.parseFloat(p.getProperty("attackSpeed"));
-                int attackDamage = Integer.parseInt(p.getProperty("attackDamage"));
-                int durability = Integer.parseInt(p.getProperty("durability"));
-                int enchantability = Integer.parseInt(p.getProperty("enchantability"));
-                return new ToolItemWrapper(p.getProperty("toolType"), miningSpeed, miningLevel, attackSpeed, attackDamage, durability, enchantability, p.getProperty("repairItem"), isFireproof);
-        }
-        return new ItemWrapper(Integer.parseInt(p.getProperty("stack")), isFireproof);
+    private Properties newProperties(File file) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new FileReader(file));
+        return properties;
     }
 
-    private void registerItem(ItemProvider item, String namespaceName, String itemName, Properties p, File textureFile) {
-        boolean isHandheld = "tool".equals(p.getProperty("type")) || Boolean.parseBoolean(p.getProperty("isHandheld"));
-
-        ItemRegistry.INSTANCE.register(namespaceName, itemName, item, p.getProperty("name"), isHandheld);
-
-        if (p.getProperty("cookingTime") != null) try {
-            ItemRegistry.INSTANCE.addFuel(item, Short.parseShort(p.getProperty("cookingTime")));
-        } catch (NumberFormatException e) {
-            LOGGER.warn("Error parsing cooking time for item: " + namespaceName + ":" + itemName);
+    private ItemProvider parseItem(ItemProperties ip) {
+        if (ip instanceof FoodItemProperties fip) {
+            if (fip.effect() != null) return new FoodItemWrapper(fip.maxStackSize(), fip.hunger(), fip.saturation(), fip.isSnack(), fip.effect(), fip.effectDuration(), fip.effectAmplifier(), fip.effectChance(), fip.isFireproof());
+            return new FoodItemWrapper(fip.maxStackSize(), fip.hunger(), fip.saturation(), fip.isSnack(), fip.isFireproof());
         }
+        if (ip instanceof ToolItemProperties tip) return new ToolItemWrapper(tip.toolType(), tip.miningSpeed(), tip.miningLevel(), tip.attackSpeed(), tip.attackDamage(), tip.durability(), tip.enchantability(), tip.repairItem(), tip.isFireproof());
+        return new ItemWrapper(ip.maxStackSize(), ip.isFireproof());
+    }
 
-        if (p.getProperty("recipe") != null) ItemRegistry.Recipe.INSTANCE.add(namespaceName, itemName, p.getProperty("recipe"));
+    private void registerItem(ItemProvider item, ItemProperties ip, String namespaceName, String itemName, File textureFile) {
+        ItemRegistry.INSTANCE.register(namespaceName, itemName, item, ip.displayName(), ip.isHandheld());
+
+        if (ip.cookingTime() != null) ItemRegistry.INSTANCE.addFuel(item, ip.cookingTime());
+
+        if (ip.recipe() != null) ItemRegistry.Recipe.INSTANCE.add(namespaceName, itemName, ip.recipe());
 
         ItemRegistry.Texture.INSTANCE.add(namespaceName, itemName, textureFile);
     }

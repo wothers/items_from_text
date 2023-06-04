@@ -49,7 +49,7 @@ public class ToolItemWrapper extends ItemWrapper {
                 settings = settings.group(ItemGroup.COMBAT);
                 toolItem = new SwordItem(customToolMaterial, attackDamage / 2, attackSpeed, settings);
             }
-            default -> throw new RuntimeException("Invalid tool type - only pickaxe, axe, shovel, hoe or sword are permitted");
+            default -> throw new IllegalArgumentException("Invalid tool type - only pickaxe, axe, shovel, hoe or sword are permitted");
         }
     }
 

@@ -26,15 +26,14 @@ public final class ItemRegistry {
     }
 
     public void register(String namespaceName, String itemName, ItemProvider item, String displayName, Boolean isHandheld) {
-        if (registeredItems.containsKey(namespaceName + ":item/" + itemName)) throw new RuntimeException("Duplicate item");
-        if (displayName == null) throw new RuntimeException("Missing item display name");
+        if (registeredItems.containsKey(namespaceName + ":item/" + itemName)) throw new ItemLoadException(namespaceName, itemName, "Duplicate item");
         Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
-        langMap.put("item." + namespaceName + "." + itemName, displayName);
+        if (displayName != null) langMap.put("item." + namespaceName + "." + itemName, displayName);
         registeredItems.put(namespaceName + ":item/" + itemName, isHandheld ? "handheld" : "generated");
     }
 
-    public void addFuel(ItemProvider item, short cookingTime) {
-        fuelMap.put(item.getItem(), (int) cookingTime);
+    public void addFuel(ItemProvider item, int cookingTime) {
+        fuelMap.put(item.getItem(), cookingTime);
     }
 
     public Map<String, String> getLangMap() {
@@ -62,7 +61,7 @@ public final class ItemRegistry {
             try {
                 if (recipe.startsWith("shaped,")) resolveShapedRecipe(namespaceName, itemName, recipe.replace("shaped,", ""));
                 else if (recipe.startsWith("shapeless,")) resolveShapelessRecipe(namespaceName, itemName, recipe.replace("shapeless,", ""));
-                else throw new RuntimeException();
+                else throw new IllegalArgumentException();
             } catch (Exception e) {
                 ItemsFromText.LOGGER.warn("Failed to resolve recipe for: " + namespaceName + ":" + itemName);
             }
@@ -78,7 +77,7 @@ public final class ItemRegistry {
 
             resultObject.addProperty("item", namespaceName + ":" + itemName);
             for (int i = 0; i < subStrings.length; i++) {
-                if (isNumeric(subStrings[i])) {
+                if (NumberUtils.isNumeric(subStrings[i])) {
                     resultObject.addProperty("count", Integer.parseInt(subStrings[i]));
                     for (int j = i + 1; j < subStrings.length; j++) {
                         JsonObject keyObject = new JsonObject();
@@ -118,15 +117,6 @@ public final class ItemRegistry {
             mainObject.add("result", resultObject);
 
             map.put(new Identifier(namespaceName, itemName), mainObject);
-        }
-
-        private boolean isNumeric(String input) {
-            try {
-                Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                return false;
-            }
-            return true;
         }
 
         public Map<Identifier, JsonElement> getMap() {
