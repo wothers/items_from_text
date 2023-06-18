@@ -37,7 +37,7 @@ public class ItemsFromText implements ModInitializer {
             try {
                 ItemProperties ip = ItemPropertiesFactory.create(newProperties(file), namespaceName, itemName, LOGGER);
                 ItemProvider item = parseItem(ip);
-                registerItem(item, ip, namespaceName, itemName, new File(dir.getAbsolutePath() + File.separator + itemName + ".png"));
+                registerItem(item, ip, namespaceName, itemName, new File(dir, itemName + ".png").getAbsoluteFile());
             } catch (IOException e) {
                 LOGGER.error("I/O error while reading from file: " + file.getAbsolutePath());
             } catch (ItemLoadException e) {

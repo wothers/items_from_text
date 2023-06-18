@@ -8,40 +8,45 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import wothers.ift.items.ItemProvider;
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class ItemRegistry {
     public static final ItemRegistry INSTANCE = new ItemRegistry();
 
-    private final Map<String, String> langMap;
+    private final Set<String> namespaces;
     private final Map<String, String> registeredItems;
+    private final Map<String, String> langMap;
     private final Map<Item, Integer> fuelMap;
 
     private ItemRegistry() {
-        langMap = new HashMap<>();
+        namespaces = new HashSet<>();
         registeredItems = new HashMap<>();
+        langMap = new HashMap<>();
         fuelMap = new HashMap<>();
     }
 
     public void register(String namespaceName, String itemName, ItemProvider item, String displayName, Boolean isHandheld) {
         if (registeredItems.containsKey(namespaceName + ":item/" + itemName)) throw new ItemLoadException(namespaceName, itemName, "Duplicate item");
         Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
-        if (displayName != null) langMap.put("item." + namespaceName + "." + itemName, displayName);
+        namespaces.add(namespaceName);
         registeredItems.put(namespaceName + ":item/" + itemName, isHandheld ? "handheld" : "generated");
+        if (displayName != null) langMap.put("item." + namespaceName + "." + itemName, displayName);
     }
 
     public void addFuel(ItemProvider item, int cookingTime) {
         fuelMap.put(item.getItem(), cookingTime);
     }
 
-    public Map<String, String> getLangMap() {
-        return Collections.unmodifiableMap(langMap);
+    public Set<String> getNamespaces() {
+        return Collections.unmodifiableSet(namespaces);
     }
 
     public Map<String, String> getRegisteredItems() {
         return Collections.unmodifiableMap(registeredItems);
+    }
+
+    public Map<String, String> getLangMap() {
+        return Collections.unmodifiableMap(langMap);
     }
 
     public Map<Item, Integer> getFuelMap() {
