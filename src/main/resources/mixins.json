@@ -8,6 +8,7 @@
     "LanguageLoaderMixin",
     "ModelLoaderMixin",
     "RecipeLoaderMixin",
+    "RegistryMixin",
     "TextureLoaderMixin"
   ],
   "injectors": {
