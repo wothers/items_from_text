@@ -35,6 +35,7 @@ public class ItemsFromText implements ModInitializer {
             String itemName = file.getName().replace(".txt", "");
 
             try {
+                if (ItemRegistry.internalContains(namespaceName, itemName)) throw new ItemLoadException(namespaceName, itemName, "Duplicate item");
                 ItemProperties ip = ItemPropertiesFactory.create(newProperties(file), namespaceName, itemName, LOGGER);
                 ItemProvider item = parseItem(ip);
                 registerItem(item, ip, namespaceName, itemName, new File(dir, itemName + ".png").getAbsoluteFile());

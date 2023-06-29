@@ -25,8 +25,11 @@ public final class ItemRegistry {
         fuelMap = new HashMap<>();
     }
 
+    public static boolean internalContains(String namespaceName, String itemName) {
+        return Registry.ITEM.containsId(new Identifier(namespaceName, itemName));
+    }
+
     public void register(String namespaceName, String itemName, ItemProvider item, String displayName, Boolean isHandheld) {
-        if (registeredItems.containsKey(namespaceName + ":item/" + itemName)) throw new ItemLoadException(namespaceName, itemName, "Duplicate item");
         Registry.register(Registry.ITEM, new Identifier(namespaceName, itemName), item.getItem());
         namespaces.add(namespaceName);
         registeredItems.put(namespaceName + ":item/" + itemName, isHandheld ? "handheld" : "generated");
