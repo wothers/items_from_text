@@ -12,6 +12,15 @@ public final class NumberUtils {
         return true;
     }
 
+    public static boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
     public static Integer tryParse(String s, Integer defaultValue) {
         try {
             return Integer.valueOf(s);

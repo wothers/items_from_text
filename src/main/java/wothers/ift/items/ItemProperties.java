@@ -30,6 +30,11 @@ public class ItemProperties {
 
         String cookingTime = p.getProperty("cookingTime");
         if (cookingTime != null && !NumberUtils.isNumeric(cookingTime)) logger.warn(String.format("Non-numeric cooking time specified - %s:%s", namespaceName, itemName));
+
+        if (initialRecipeCheck()) {
+            p.remove("recipe");
+            logger.warn(String.format("Invalid recipe structure - %s:%s", namespaceName, itemName));
+        }
     }
 
     public boolean validateRequired() {
@@ -38,6 +43,29 @@ public class ItemProperties {
             return true;
         }
         return false;
+    }
+
+    private boolean initialRecipeCheck() {
+        if (recipe() == null) return false;
+        String[] strings = recipe().split(",");
+        if (strings.length < 3) return true;
+        if (recipe().startsWith("shaped")) return initialShapedRecipeCheck(strings);
+        if (recipe().startsWith("shapeless")) return initialShapelessRecipeCheck(strings);
+        return true;
+    }
+
+    private boolean initialShapedRecipeCheck(String[] strings) {
+        if (NumberUtils.isInteger(strings[1])) return true;
+        if (strings[1].length() < 1 || strings[1].length() > 3) return true;
+        for (int i = 2; i < 4; i++) {
+            if (NumberUtils.isInteger(strings[i])) return false;
+            if (strings[i].length() != strings[1].length()) return true;
+        }
+        return !NumberUtils.isInteger(strings[4]);
+    }
+
+    private boolean initialShapelessRecipeCheck(String[] strings) {
+        return !NumberUtils.isInteger(strings[1]);
     }
 
     boolean checkProperty(String key, Function<String, Boolean> isValid) {

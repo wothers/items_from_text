@@ -66,35 +66,30 @@ public final class ItemRegistry {
         }
 
         public void add(String namespaceName, String itemName, String recipe) {
-            try {
-                if (recipe.startsWith("shaped,")) resolveShapedRecipe(namespaceName, itemName, recipe.replace("shaped,", ""));
-                else if (recipe.startsWith("shapeless,")) resolveShapelessRecipe(namespaceName, itemName, recipe.replace("shapeless,", ""));
-                else throw new IllegalArgumentException();
-            } catch (Exception e) {
-                ItemsFromText.LOGGER.warn("Failed to resolve recipe for: " + namespaceName + ":" + itemName);
-            }
+            String[] strings = recipe.split(",");
+            strings = Arrays.copyOfRange(strings, 1, strings.length);
+            if (recipe.startsWith("shaped,")) addShaped(namespaceName, itemName, strings);
+            if (recipe.startsWith("shapeless,")) addShapeless(namespaceName, itemName, strings);
         }
 
-        private void resolveShapedRecipe(String namespaceName, String itemName, String recipe) {
+        private void addShaped(String namespaceName, String itemName, String[] strings) {
             JsonObject mainObject = new JsonObject();
             JsonArray patternArray = new JsonArray();
             JsonObject keysObject = new JsonObject();
             JsonObject resultObject = new JsonObject();
 
-            String[] subStrings = recipe.split(",");
-
             resultObject.addProperty("item", namespaceName + ":" + itemName);
-            for (int i = 0; i < subStrings.length; i++) {
-                if (NumberUtils.isNumeric(subStrings[i])) {
-                    resultObject.addProperty("count", Integer.parseInt(subStrings[i]));
-                    for (int j = i + 1; j < subStrings.length; j++) {
+            for (int i = 0; i < strings.length; i++) {
+                if (NumberUtils.isInteger(strings[i])) {
+                    resultObject.addProperty("count", Integer.parseInt(strings[i]));
+                    for (int j = i + 1; j < strings.length; j++) {
                         JsonObject keyObject = new JsonObject();
-                        keyObject.addProperty("item", subStrings[j].substring(2));
-                        keysObject.add(Character.toString(subStrings[j].charAt(0)), keyObject);
+                        keyObject.addProperty("item", strings[j].substring(2));
+                        keysObject.add(Character.toString(strings[j].charAt(0)), keyObject);
                     }
                     break;
                 }
-                patternArray.add(subStrings[i]);
+                patternArray.add(strings[i]);
             }
 
             mainObject.addProperty("type", "minecraft:crafting_shaped");
@@ -105,18 +100,16 @@ public final class ItemRegistry {
             map.put(new Identifier(namespaceName, itemName), mainObject);
         }
 
-        private void resolveShapelessRecipe(String namespaceName, String itemName, String recipe) {
+        private void addShapeless(String namespaceName, String itemName, String[] strings) {
             JsonObject mainObject = new JsonObject();
             JsonArray ingredientArray = new JsonArray();
             JsonObject resultObject = new JsonObject();
 
-            String[] subStrings = recipe.split(",");
-
             resultObject.addProperty("item", namespaceName + ":" + itemName);
-            resultObject.addProperty("count", Integer.parseInt(subStrings[0]));
-            for (int i = 1; i < subStrings.length; i++) {
+            resultObject.addProperty("count", Integer.parseInt(strings[0]));
+            for (int i = 1; i < strings.length; i++) {
                 JsonObject ingredientObject = new JsonObject();
-                ingredientObject.addProperty("item", subStrings[i]);
+                ingredientObject.addProperty("item", strings[i]);
                 ingredientArray.add(ingredientObject);
             }
 
