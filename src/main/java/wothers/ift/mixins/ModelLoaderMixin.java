@@ -4,6 +4,7 @@ import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -11,17 +12,18 @@ import wothers.ift.ItemRegistry;
 
 @Mixin(ModelLoader.class)
 public class ModelLoaderMixin {
-    @Inject(method = "loadModelFromJson", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourceManager;getResource(Lnet/minecraft/util/Identifier;)Lnet/minecraft/resource/Resource;"), cancellable = true)
+    @Inject(method = "loadModelFromJson", at = @At(value = "INVOKE", target="Lnet/minecraft/resource/ResourceManager;openAsReader(Lnet/minecraft/util/Identifier;)Ljava/io/BufferedReader;"), cancellable = true)
     private void loadModelFromJson(Identifier id, CallbackInfoReturnable<JsonUnbakedModel> cir) {
         if (!ItemRegistry.INSTANCE.getRegisteredItems().containsKey(id.toString())) return;
-        String modelJson = createItemModelJsonString(id.toString(), ItemRegistry.INSTANCE.getRegisteredItems().get(id.toString()));
+        String modelJson = ift$createItemModelJsonString(id.toString(), ItemRegistry.INSTANCE.getRegisteredItems().get(id.toString()));
         JsonUnbakedModel model = JsonUnbakedModel.deserialize(modelJson);
         model.id = id.toString();
         cir.setReturnValue(model);
         cir.cancel();
     }
 
-    private String createItemModelJsonString(String id, String modelType) {
+    @Unique
+    private String ift$createItemModelJsonString(String id, String modelType) {
         return "{\n" + "  \"parent\": \"item/" + modelType + "\",\n" + "  \"textures\": {\n" + "    \"layer0\": \"" + id + "\"\n" + "  }\n" + "}";
     }
 }

@@ -56,7 +56,7 @@ public class ItemProperties {
 
     private boolean initialShapedRecipeCheck(String[] strings) {
         if (NumberUtils.isInteger(strings[1])) return true;
-        if (strings[1].length() < 1 || strings[1].length() > 3) return true;
+        if (strings[1].isEmpty() || strings[1].length() > 3) return true;
         for (int i = 2; i < 4; i++) {
             if (NumberUtils.isInteger(strings[i])) return false;
             if (strings[i].length() != strings[1].length()) return true;
