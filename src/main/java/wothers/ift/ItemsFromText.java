@@ -1,95 +1,76 @@
 package wothers.ift;
 
+import net.fabricmc.api.ModInitializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import wothers.ift.items.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Properties;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import net.fabricmc.api.ModInitializer;
-import wothers.hr.HyperRegistry;
-import wothers.hr.items.HyperFood;
-import wothers.hr.items.HyperItem;
-import wothers.hr.items.HyperTool;
 
 public class ItemsFromText implements ModInitializer {
     public static final String MOD_ID = "itemsfromtext";
-    public static final File MAIN_FOLDER = Paths.get(MOD_ID).toFile();
+    public static final File MAIN_DIR = new File(MOD_ID);
     public static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void onInitialize() {
         File[] subDirectories = {};
-        if (MAIN_FOLDER.exists())
-            subDirectories = MAIN_FOLDER.listFiles(File::isDirectory);
+        if (MAIN_DIR.exists()) subDirectories = MAIN_DIR.listFiles(File::isDirectory);
 
-        parseItems(MAIN_FOLDER);
+        loadItems(MAIN_DIR);
         for (File dir : subDirectories) {
-            parseItems(dir);
+            loadItems(dir);
         }
     }
 
-    private void parseItems(File dir) {
+    private void loadItems(File dir) {
         String namespaceName = dir.getName();
 
         File[] txtFiles = {};
-        if (dir.exists())
-            txtFiles = dir.listFiles((file, string) -> string.endsWith(".txt"));
+        if (dir.exists()) txtFiles = dir.listFiles((file, string) -> string.endsWith(".txt"));
 
         for (File file : txtFiles) {
             String itemName = file.getName().replace(".txt", "");
 
             try {
-                Properties p = new Properties();
-                p.load(new FileReader(file));
-                parseItem(namespaceName, itemName, p);
-                HyperRegistry.Texture.INSTANCE.add(namespaceName, itemName, new File(dir.getAbsolutePath() + File.separator + itemName + ".png"));
+                if (ItemRegistry.internalContains(namespaceName, itemName)) throw new ItemLoadException(namespaceName, itemName, "Duplicate item");
+                ItemProperties ip = ItemPropertiesFactory.create(newProperties(file), namespaceName, itemName, LOGGER);
+                ItemProvider item = parseItem(ip);
+                registerItem(item, ip, namespaceName, itemName, new File(dir, itemName + ".png").getAbsoluteFile());
             } catch (IOException e) {
                 LOGGER.error("I/O error while reading from file: " + file.getAbsolutePath());
+            } catch (ItemLoadException e) {
+                LOGGER.error(e.getMessage());
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(ItemLoadException.getErrorMessage(namespaceName, itemName, e.getMessage()));
             }
         }
     }
 
-    private void parseItem(String namespaceName, String itemName, Properties p) {
-        try {
-            HyperItem item = null;
-            boolean isFireproof = Boolean.parseBoolean(p.getProperty("isFireproof"));
-            boolean isHandheld = Boolean.parseBoolean(p.getProperty("isHandheld"));
-            if (p.getProperty("type") != null) {
-                switch (p.getProperty("type")) {
-                    case "food":
-                        int hunger = Integer.parseInt(p.getProperty("hunger"));
-                        float saturation = Float.parseFloat(p.getProperty("saturation"));
-                        boolean isSnack = Boolean.parseBoolean(p.getProperty("isSnack"));
-                        item = new HyperFood(Integer.parseInt(p.getProperty("stack")), hunger, saturation, isSnack, isFireproof);
-                        break;
-                    case "tool":
-                        float miningSpeed = Float.parseFloat(p.getProperty("miningSpeed"));
-                        int miningLevel = Integer.parseInt(p.getProperty("miningLevel"));
-                        float attackSpeed = Float.parseFloat(p.getProperty("attackSpeed"));
-                        int attackDamage = Integer.parseInt(p.getProperty("attackDamage"));
-                        int durability = Integer.parseInt(p.getProperty("durability"));
-                        int enchantability = Integer.parseInt(p.getProperty("enchantability"));
-                        item = new HyperTool(p.getProperty("toolType"), miningSpeed, miningLevel, attackSpeed, attackDamage, durability, enchantability, p.getProperty("repairItem"), isFireproof);
-                        isHandheld = true;
-                        break;
-                }
-            } else {
-                item = new HyperItem(Integer.parseInt(p.getProperty("stack")), isFireproof);
-            }
+    private Properties newProperties(File file) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new FileReader(file));
+        return properties;
+    }
 
-            HyperRegistry.INSTANCE.register(namespaceName, itemName, item, p.getProperty("name"), isHandheld);
-            if (p.getProperty("cookingTime") != null)
-                try {
-                    HyperRegistry.INSTANCE.addFuel(item, Short.parseShort(p.getProperty("cookingTime")));
-                } catch (NumberFormatException e) {
-                    LOGGER.warn("Error parsing cooking time for item: " + namespaceName + ":" + itemName);
-                }
-            if (p.getProperty("recipe") != null)
-                HyperRegistry.Recipe.INSTANCE.add(namespaceName, itemName, p.getProperty("recipe"));
-        } catch (RuntimeException e) {
-            LOGGER.error("Failed to load item: " + namespaceName + ":" + itemName + " - " + e);
+    private ItemProvider parseItem(ItemProperties ip) {
+        if (ip instanceof FoodItemProperties fip) {
+            if (fip.effect() != null) return new FoodItemWrapper(fip.maxStackSize(), fip.hunger(), fip.saturation(), fip.isSnack(), fip.effect(), fip.effectDuration(), fip.effectAmplifier(), fip.effectChance(), fip.isFireproof());
+            return new FoodItemWrapper(fip.maxStackSize(), fip.hunger(), fip.saturation(), fip.isSnack(), fip.isFireproof());
         }
+        if (ip instanceof ToolItemProperties tip) return new ToolItemWrapper(tip.toolType(), tip.miningSpeed(), tip.miningLevel(), tip.attackSpeed(), tip.attackDamage(), tip.durability(), tip.enchantability(), tip.repairItem(), tip.isFireproof());
+        return new ItemWrapper(ip.maxStackSize(), ip.isFireproof());
+    }
+
+    private void registerItem(ItemProvider item, ItemProperties ip, String namespaceName, String itemName, File textureFile) {
+        ItemRegistry.INSTANCE.register(namespaceName, itemName, item, ip.displayName(), ip.isHandheld());
+
+        if (ip.cookingTime() != null) ItemRegistry.INSTANCE.addFuel(item, ip.cookingTime());
+
+        if (ip.recipe() != null) ItemRegistry.Recipe.INSTANCE.add(namespaceName, itemName, ip.recipe());
+
+        ItemRegistry.Texture.INSTANCE.add(namespaceName, itemName, textureFile);
     }
 }

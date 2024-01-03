@@ -1,34 +1,50 @@
 package wothers.ift.mixins;
 
+import net.minecraft.resource.DefaultResourcePack;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wothers.ift.ItemRegistry;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceImpl;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import wothers.hr.HyperRegistry;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-@Mixin(SpriteAtlasTexture.class)
+@Mixin(DefaultResourcePack.class)
 public class TextureLoaderMixin {
-    @Redirect(method = "method_18160", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourceManager;getResource(Lnet/minecraft/util/Identifier;)Lnet/minecraft/resource/Resource;"))
-    private Resource loadExternalResource(ResourceManager resourceManager, Identifier id) throws IOException {
-        if (HyperRegistry.Texture.INSTANCE.getMap().containsKey(id.toString())) {
-            FileInputStream fileInputStream = new FileInputStream(HyperRegistry.Texture.INSTANCE.getMap().get(id.toString()));
-            return new ResourceImpl(null, id, fileInputStream, null);
-        }
-        return resourceManager.getResource(id);
+    @Final
+    @Shadow
+    public Set<String> namespaces;
+
+    @Inject(method = "getNamespaces", at = @At(value = "HEAD"), cancellable = true)
+    private void getAppendedNamespaces(ResourceType type, CallbackInfoReturnable<Set<String>> cir) {
+        Set<String> namespaces = new HashSet<>(this.namespaces);
+        namespaces.addAll(ItemRegistry.INSTANCE.getNamespaces());
+        cir.setReturnValue(Collections.unmodifiableSet(namespaces));
+        cir.cancel();
     }
 
-    @Redirect(method = "loadSprite", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourceManager;getResource(Lnet/minecraft/util/Identifier;)Lnet/minecraft/resource/Resource;"))
-    private Resource loadExternalResource2(ResourceManager resourceManager, Identifier id) throws IOException {
-        if (HyperRegistry.Texture.INSTANCE.getMap().containsKey(id.toString())) {
-            FileInputStream fileInputStream = new FileInputStream(HyperRegistry.Texture.INSTANCE.getMap().get(id.toString()));
-            return new ResourceImpl(null, id, fileInputStream, null);
-        }
-        return resourceManager.getResource(id);
+    @Inject(method = "contains", at = @At(value = "HEAD"), cancellable = true)
+    private void overrideContains(ResourceType type, Identifier id, CallbackInfoReturnable<Boolean> cir) {
+        if (!ItemRegistry.Texture.INSTANCE.getMap().containsKey(id.toString())) return;
+        cir.setReturnValue(true);
+        cir.cancel();
+    }
+
+    @Inject(method = "open", at = @At(value = "HEAD"), cancellable = true)
+    private void openExternal(ResourceType type, Identifier id, CallbackInfoReturnable<InputStream> cir) throws IOException {
+        Map<String, File> textureMap = ItemRegistry.Texture.INSTANCE.getMap();
+        if (!textureMap.containsKey(id.toString())) return;
+        cir.setReturnValue(new FileInputStream(textureMap.get(id.toString())));
+        cir.cancel();
     }
 }
